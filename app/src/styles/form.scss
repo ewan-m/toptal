@@ -1,0 +1,32 @@
+@import "./variables.scss";
+
+.form {
+	box-shadow: $shadow5px;
+	padding: $size2;
+	border-radius: $size0;
+	max-width: 400px;
+
+	&__label {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: $size1;
+		font-weight: 700;
+		color: $darkGrey;
+	}
+
+	&__input {
+		margin-top: $size-3;
+		padding: $size0;
+		border-radius: $size-3;
+		border: 1px solid $grey;
+		outline: none;
+		box-sizing: content-box;
+		font-weight: 400;
+		color: $darkestGrey;
+		font-family: inherit;
+
+		&:focus {
+			border: 1px solid $darkGrey;
+		}
+	}
+}

@@ -1,0 +1,26 @@
+@import "../styles/variables.scss";
+
+.page {
+	max-width: $maxWidth;
+	width: 100%;
+	margin: 0 auto;
+	animation: fadeInBottomEntrance 0.3s ease-in-out forwards;
+
+	&__title {
+		font-size: $size6;
+		margin: 0 0 $size4;
+		font-weight: 700;
+		color: $darkestGrey;
+	}
+}
+
+@keyframes fadeInBottomEntrance {
+	0% {
+		transform: translateY($size4) scale(0.95);
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}

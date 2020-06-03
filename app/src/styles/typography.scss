@@ -1,0 +1,16 @@
+@import "./variables.scss";
+
+.paragraph {
+	max-width: 60ch;
+	color: $darkestGrey;
+	margin: $size2 0;
+	font-size: $size1;
+
+	&:last-child {
+		margin: $size2 0 0;
+	}
+
+	&--informational {
+		font-size: $size0;
+	}
+}
