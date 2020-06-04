@@ -10,8 +10,8 @@ export const SiteContainer: FunctionComponent = ({ children }) => {
 				<div className="siteHeader__container">
 					<Link className="siteHeader__a" to="/">
 						<h1 className="siteHeader__h1">
-							<span style={{ fontWeight: 300 }}>Glass</span>
-							<span style={{ fontWeight: 500 }}>hour</span>
+							<span style={{ fontWeight: 400 }}>glass</span>
+							<span style={{ fontWeight: 600 }}>hour.</span>
 						</h1>
 					</Link>
 				</div>

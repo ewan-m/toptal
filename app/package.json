@@ -1,10 +1,9 @@
 {
-  "name": "shopping-list",
+  "name": "ewan-morrison",
   "version": "1.0.0",
-  "description": "A CRUD shopping list",
+  "description": "A CRUD time management application - UI",
   "main": "src/index.html",
   "browserslist": "> 0.25%, not dead",
-  "homepage": "/shopping-list",
   "author": "Ewan Morrison",
   "license": "MIT",
   "scripts": {
