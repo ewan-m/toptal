@@ -1,7 +1,7 @@
 @import "./variables.scss";
 
 .paragraph {
-	max-width: 60ch;
+	max-width: 550px;
 	color: $darkestGrey;
 	margin: $size2 0;
 	font-size: $size1;
@@ -12,5 +12,10 @@
 
 	&--informational {
 		font-size: $size0;
+	}
+
+	&--hero {
+		font-size: $size6;
+		font-weight: 300;
 	}
 }

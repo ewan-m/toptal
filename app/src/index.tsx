@@ -7,6 +7,7 @@ import "./index.scss";
 import "./pages/Page.scss";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
+import { Landing } from "./pages/Landing";
 
 const history = createBrowserHistory();
 
@@ -15,6 +16,7 @@ const Index = () => {
 		<Router history={history}>
 			<SiteContainer>
 				<Switch>
+					<Route path="/" exact component={Landing} />
 					<Route path="/sign-in" exact component={SignIn} />
 					<Route path="/sign-up" exact component={SignUp} />
 				</Switch>
