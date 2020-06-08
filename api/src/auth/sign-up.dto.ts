@@ -1,6 +1,8 @@
-import { Role } from "../constants/roles";
-import { IsNotEmpty, IsEmail, IsAlpha } from "class-validator";
+import { IsEmail, IsNotEmpty } from "class-validator";
+import { IsPasswordComplex } from "./is-password-complex.validator";
 import { IsRole } from "./is-role.validator";
+import { IsUniqueEmail } from "./is-unique-email.validator";
+import { Role } from "./roles.type";
 
 export class SignUpDto {
 	@IsNotEmpty()
@@ -8,9 +10,11 @@ export class SignUpDto {
 
 	@IsNotEmpty()
 	@IsEmail()
+	@IsUniqueEmail()
 	email: string;
 
 	@IsNotEmpty()
+	@IsPasswordComplex()
 	password: string;
 
 	@IsNotEmpty()

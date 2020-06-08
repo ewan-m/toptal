@@ -5,7 +5,7 @@ import {
 	ValidatorConstraint,
 	ValidatorConstraintInterface,
 } from "class-validator";
-import { roles } from "src/constants/roles";
+import { roles } from "./roles.type";
 
 @ValidatorConstraint()
 export class IsRoleConstraint implements ValidatorConstraintInterface {
@@ -22,7 +22,7 @@ export function IsRole(validationOptions?: ValidationOptions) {
 			options: {
 				message: `${propertyName} must be either '${Object.keys(roles).join(
 					"', '"
-				)}'`,
+				)}'.`,
 				...validationOptions,
 			},
 			constraints: [],
