@@ -1,9 +1,18 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { useTokenManager } from "../hooks/use-token-manager";
+import { Icon } from "../components/Icon";
 
-export const Landing = () => (
-	<div className="page">
-		<div className="heroContainer">
+export const Landing = () => {
+	const history = useHistory();
+	const tokenManager = useTokenManager();
+
+	if (tokenManager.getToken()) {
+		history.push("/dashboard");
+	}
+
+	return (
+		<div className="page">
 			<p className="paragraph paragraph--hero">
 				Manage <strong>your time</strong> and boost{" "}
 				<strong>your productivity</strong> with ease.
@@ -13,8 +22,8 @@ export const Landing = () => (
 				management tools.
 			</p>
 			<Link to="/sign-in" className="button button__primary button--large">
-				Get started
+				Get started<Icon withMargin="right">arrow_forward_ios</Icon>
 			</Link>
 		</div>
-	</div>
-);
+	);
+};

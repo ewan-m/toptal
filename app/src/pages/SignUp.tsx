@@ -1,17 +1,42 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useState, MouseEvent } from "react";
-import { roles } from "../constants/roles";
+import { roles, Role } from "../constants/roles";
+import { useHttpClient } from "../hooks/use-http-client";
+import { useTokenManager } from "../hooks/use-token-manager";
+import { Icon } from "../components/Icon";
+import { Errors } from "../components/Errors";
 
 export const SignUp = () => {
 	const [name, setName] = useState("");
-	const [role, setRole] = useState(roles.user);
-	const [username, setUsername] = useState("");
+	const [role, setRole] = useState("user" as Role);
+	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [errors, setErrors] = useState([]);
 
-	const onSubmit = (e: MouseEvent<HTMLButtonElement>) => {
+	const history = useHistory();
+	const http = useHttpClient();
+	const tokenManager = useTokenManager();
+
+	const onSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-		console.log({ username, password, name, role });
+		setErrors([]);
+
+		const result = await http.request({
+			method: "PUT",
+			uri: "sign-up",
+			body: { email, password, name, role },
+			withAuth: false,
+		});
+
+		if (result.token) {
+			tokenManager.setToken(result.token);
+			history.push("/dashboard");
+		}
+
+		if (result.error) {
+			setErrors(result.message);
+		}
 	};
 
 	return (
@@ -20,7 +45,7 @@ export const SignUp = () => {
 			<p className="paragraph">
 				To create your account we first need some information about you.
 			</p>
-			<form className="form">
+			<form className="form card">
 				<label className="form__label">
 					Name
 					<input
@@ -37,7 +62,7 @@ export const SignUp = () => {
 					<select
 						className="form__input"
 						onChange={(e) => {
-							setRole(e.target.value);
+							setRole(e.target.value as Role);
 						}}
 						value={role}
 					>
@@ -49,11 +74,11 @@ export const SignUp = () => {
 					</select>
 				</label>
 				<label className="form__label">
-					Username
+					Email
 					<input
-						value={username}
+						value={email}
 						onChange={(e) => {
-							setUsername(e.target.value);
+							setEmail(e.target.value);
 						}}
 						className="form__input"
 						type="text"
@@ -75,8 +100,9 @@ export const SignUp = () => {
 					className="button button__primary button--large"
 					type="submit"
 				>
-					Sign up
+					Sign up<Icon withMargin="right">arrow_forward_ios</Icon>
 				</button>
+				<Errors errors={errors} />
 			</form>
 			<p className="paragraph paragraph--informational">
 				Already have an account? No problem, simply{" "}

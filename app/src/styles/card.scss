@@ -1,0 +1,6 @@
+@import "./variables.scss";
+.card {
+	box-shadow: $shadow5px;
+	padding: $size2;
+	border-radius: $size0;
+}

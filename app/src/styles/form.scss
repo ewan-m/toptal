@@ -1,9 +1,6 @@
 @import "./variables.scss";
 
 .form {
-	box-shadow: $shadow5px;
-	padding: $size2;
-	border-radius: $size0;
 	max-width: 400px;
 
 	&__label {

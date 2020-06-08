@@ -14,6 +14,13 @@
 		font-size: $size0;
 	}
 
+	&--error {
+		font-size: $size1;
+		color: $error;
+		display: flex;
+		align-items: center;
+	}
+
 	&--hero {
 		font-size: $size6;
 		font-weight: 300;

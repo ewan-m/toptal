@@ -16,18 +16,32 @@
 		margin: 0 auto;
 		max-width: $maxWidth;
 		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	&__h1 {
 		margin: 0;
 		font-size: $size4;
 		font-weight: 900;
-		color: $white;
 		letter-spacing: -0.05rem;
 	}
 
 	&__a {
 		text-decoration: none;
+		color: $white;
+	}
+
+	&__nav {
+		margin-top: $size-2;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		&__link {
+			margin-right: $size2;
+		}
 	}
 }
 
@@ -37,13 +51,12 @@
 }
 
 .siteFooter {
-	background-color: $darkestGrey;
-	color: $white;
 	font-size: $size0;
-	text-align: center;
-	padding: $size-3;
+	padding: $size-1;
 
 	&__p {
-		margin: 0;
+		max-width: $maxWidth;
+		width: 100%;
+		margin: 0 auto;
 	}
 }
