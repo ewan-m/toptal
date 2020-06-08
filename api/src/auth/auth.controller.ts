@@ -40,7 +40,7 @@ export class AuthController {
 			}
 		} catch (error) {
 			throw new UnauthorizedException([
-				"There was error logging in - either your password was incorrect or you need to sign up.",
+				"There was an error logging in - either your password was incorrect or you need to sign up.",
 			]);
 		}
 	}
