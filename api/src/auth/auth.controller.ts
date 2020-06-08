@@ -74,7 +74,7 @@ export class AuthController {
 		<a href="${process.env.APPLICATION_URL}/sign-in?token=${token}">Sign in to Glasshour</a>
 	</p>
 	<p>
-	The Glasshour team ❤️
+	Glasshour ❤️
 	</p>`,
 				});
 			}
