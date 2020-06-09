@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useHttpClient } from "../hooks/use-http-client";
 import { Icon } from "../components/Icon";
 import { Errors } from "../components/Errors";
+import MagicLinkImage from "../assets/illustrations/new_message_monochromatic.svg";
 
 enum Situation {
 	initial,
@@ -22,65 +23,79 @@ export const MagicLink = () => {
 		setSituation(Situation.sending);
 		setErrors([]);
 
-		const result = await http.request({
-			method: "POST",
-			uri: "magic-link",
-			body: { email },
-			withAuth: false,
-		});
+		try {
+			const result = await http.request({
+				method: "POST",
+				uri: "magic-link",
+				body: { email },
+				withAuth: false,
+			});
 
-		if (result.error) {
-			setErrors(result.message);
+			if (result.error) {
+				setErrors(result.message);
+				setSituation(Situation.initial);
+			} else {
+				setSituation(Situation.success);
+			}
+		} catch (error) {
+			setErrors(["Something went wrong sending you a magic link."]);
 			setSituation(Situation.initial);
-		} else {
-			setSituation(Situation.success);
 		}
 	};
 
 	return (
-		<div className="page">
-			<h2 className="page__title">Magic link</h2>
-			{situation === Situation.initial && (
-				<>
+		<div className="page page--flex">
+			<div className="page__row">
+				<div className="page__col page__col--fixedWidth">
+					<h2 className="page__title">Magic link</h2>
 					<p className="paragraph">
-						Enter the email you signed up with to send a sign in link to your email.
+						Enter the email you signed up with to send a sign in link to your inbox.
 					</p>
-					<form className="form card">
-						<label className="form__label">
-							Email
-							<input
-								value={email}
-								onChange={(e) => {
-									setEmail(e.target.value);
-								}}
-								className="form__input"
-								type="text"
-							/>
-						</label>
-						<button
-							className="button button__primary button--large"
-							onClick={onSubmit}
-							type="submit"
-						>
-							Send a magic link<Icon withMargin="right">arrow_forward_ios</Icon>
-						</button>
-						<Errors errors={errors} />
-					</form>
-				</>
-			)}
-			{situation === Situation.sending && (
-				<p className="card">Sending your magic link.</p>
-			)}
-			{situation === Situation.success && (
-				<p className="card">
-					If you have an account registered with us by that email you should find a
-					magic sign in link in your inbox.
-				</p>
-			)}
-			<p className="paragraph paragraph--informational">
-				Remembered your password? No problem, simply{" "}
-				<Link to="/sign-in">click here to sign in</Link>.
-			</p>
+					{(situation === Situation.initial || situation === Situation.sending) && (
+						<>
+							<form className="form card">
+								<label className="form__label">
+									Email
+									<input
+										value={email}
+										onChange={(e) => {
+											setEmail(e.target.value);
+										}}
+										className="form__input"
+										type="text"
+									/>
+								</label>
+								<button
+									className="button button__primary button--large"
+									onClick={onSubmit}
+									type="submit"
+									disabled={situation === Situation.sending}
+								>
+									Send a magic link<Icon withMargin="right">arrow_forward_ios</Icon>
+								</button>
+								<Errors errors={errors} />
+							</form>
+						</>
+					)}
+					{situation === Situation.success && (
+						<p className="card">
+							If you have an account registered with us by that email you should find a
+							magic sign in link in your inbox.
+						</p>
+					)}
+					<p className="paragraph paragraph--informational">
+						Remembered your password? No problem, simply{" "}
+						<Link to="/sign-in">click here to sign in</Link>.
+					</p>
+				</div>
+				<div className="page__col page__col--centerImage">
+					<img
+						className="page__mainImage"
+						src={MagicLinkImage}
+						alt="Vector illustration of new message"
+					/>
+				</div>
+			</div>
 		</div>
 	);
 };

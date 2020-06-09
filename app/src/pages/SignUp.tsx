@@ -6,13 +6,15 @@ import { useHttpClient } from "../hooks/use-http-client";
 import { useTokenManager } from "../hooks/use-token-manager";
 import { Icon } from "../components/Icon";
 import { Errors } from "../components/Errors";
+import SignUpImage from "../assets/illustrations/receptionist_monochromatic.svg";
 
 export const SignUp = () => {
 	const [name, setName] = useState("");
 	const [role, setRole] = useState("user" as Role);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [errors, setErrors] = useState([]);
+	const [errors, setErrors] = useState([] as string[]);
+	const [isSendingRequest, setIsSendingRequest] = useState(false);
 
 	const history = useHistory();
 	const http = useHttpClient();
@@ -21,93 +23,112 @@ export const SignUp = () => {
 	const onSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		setErrors([]);
+		setIsSendingRequest(true);
 
-		const result = await http.request({
-			method: "PUT",
-			uri: "sign-up",
-			body: { email, password, name, role },
-			withAuth: false,
-		});
+		try {
+			const result = await http.request({
+				method: "PUT",
+				uri: "sign-up",
+				body: { email, password, name, role },
+				withAuth: false,
+			});
 
-		if (result.token) {
-			tokenManager.setToken(result.token);
-			history.push("/dashboard");
-		}
+			setIsSendingRequest(false);
+			if (result.token) {
+				tokenManager.setToken(result.token);
+				history.push("/dashboard");
+			}
 
-		if (result.error) {
-			setErrors(result.message);
+			if (result.error) {
+				setErrors(result.message);
+			}
+		} catch (error) {
+			setIsSendingRequest(false);
+			setErrors(["Something went wrong signing you up."]);
 		}
 	};
 
 	return (
 		<div className="page">
-			<h2 className="page__title">Sign up</h2>
-			<p className="paragraph">
-				To create your account we first need some information about you.
-			</p>
-			<form className="form card">
-				<label className="form__label">
-					Name
-					<input
-						value={name}
-						onChange={(e) => {
-							setName(e.target.value);
-						}}
-						className="form__input"
-						type="text"
+			<div className="page__row">
+				<div className="page__col page__col--fixedWidth">
+					<h2 className="page__title">Sign up</h2>
+					<p className="paragraph">
+						To create your account we first need some information about you.
+					</p>
+					<form className="form card">
+						<label className="form__label">
+							Name
+							<input
+								value={name}
+								onChange={(e) => {
+									setName(e.target.value);
+								}}
+								className="form__input"
+								type="text"
+							/>
+						</label>
+						<label className="form__label">
+							Role
+							<select
+								className="form__input"
+								onChange={(e) => {
+									setRole(e.target.value as Role);
+								}}
+								value={role}
+							>
+								{Object.entries(roles).map(([roleValue, roleDisplay]) => (
+									<option key={roleValue} value={roleValue}>
+										{roleDisplay}
+									</option>
+								))}
+							</select>
+						</label>
+						<label className="form__label">
+							Email
+							<input
+								value={email}
+								onChange={(e) => {
+									setEmail(e.target.value);
+								}}
+								className="form__input"
+								type="text"
+							/>
+						</label>
+						<label className="form__label">
+							Password
+							<input
+								value={password}
+								onChange={(e) => {
+									setPassword(e.target.value);
+								}}
+								className="form__input"
+								type="password"
+							/>
+						</label>
+						<button
+							onClick={onSubmit}
+							className="button button__primary button--large"
+							type="submit"
+							disabled={isSendingRequest}
+						>
+							Sign up<Icon withMargin="right">arrow_forward_ios</Icon>
+						</button>
+						<Errors errors={errors} />
+					</form>
+					<p className="paragraph paragraph--informational">
+						Already have an account? No problem, simply{" "}
+						<Link to="/sign-in">click here to sign in</Link>.
+					</p>
+				</div>
+				<div className="page__col page__col--centerImage">
+					<img
+						alt="Vector illustration of a receptionist"
+						className="page__mainImage"
+						src={SignUpImage}
 					/>
-				</label>
-				<label className="form__label">
-					Role
-					<select
-						className="form__input"
-						onChange={(e) => {
-							setRole(e.target.value as Role);
-						}}
-						value={role}
-					>
-						{Object.entries(roles).map(([roleValue, roleDisplay]) => (
-							<option key={roleValue} value={roleValue}>
-								{roleDisplay}
-							</option>
-						))}
-					</select>
-				</label>
-				<label className="form__label">
-					Email
-					<input
-						value={email}
-						onChange={(e) => {
-							setEmail(e.target.value);
-						}}
-						className="form__input"
-						type="text"
-					/>
-				</label>
-				<label className="form__label">
-					Password
-					<input
-						value={password}
-						onChange={(e) => {
-							setPassword(e.target.value);
-						}}
-						className="form__input"
-						type="password"
-					/>
-				</label>
-				<button
-					onClick={onSubmit}
-					className="button button__primary button--large"
-					type="submit"
-				>
-					Sign up<Icon withMargin="right">arrow_forward_ios</Icon>
-				</button>
-				<Errors errors={errors} />
-			</form>
-			<p className="paragraph paragraph--informational">
-				Already have an account? No problem, simply{" "}
-				<Link to="/sign-in">click here to sign in</Link>.
-			</p>
+				</div>
+			</div>
 		</div>
 	);
 };
