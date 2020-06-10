@@ -6,8 +6,8 @@ import { IsUniqueEmailConstraint } from "./auth/validators/is-unique-email.valid
 import { User } from "./auth/user.entity";
 import { HasValidTokenGuard } from "./guards/has-valid-token.guard";
 import config from "./orm-config";
-import { UserPreferencesController } from "./user-preference/user-preferences.controller";
-import { UserPreference } from "./user-preference/user-preferences.entity";
+import { UserPreferencesController } from "./user-preferences/user-preferences.controller";
+import { UserPreference } from "./user-preferences/user-preferences.entity";
 import { WorkLog } from "./work-log/work-log.entity";
 import { TokenIdMatchesRequestedId } from "./guards/token-id-matches-requested-id.guard";
 

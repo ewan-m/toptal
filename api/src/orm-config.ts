@@ -1,6 +1,6 @@
 import { ConnectionOptions } from "typeorm";
 import { User } from "./auth/user.entity";
-import { UserPreference } from "./user-preference/user-preferences.entity";
+import { UserPreference } from "./user-preferences/user-preferences.entity";
 import { WorkLog } from "./work-log/work-log.entity";
 import { CreateTables1591786112692 } from "./migrations/1591786112692-CreateTables";
 import { RenameInvalidColumn1591791275462 } from "./migrations/1591791275462-RenameInvalidColumn";
