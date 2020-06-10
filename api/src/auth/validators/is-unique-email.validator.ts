@@ -5,13 +5,20 @@ import {
 	ValidatorConstraint,
 	ValidatorConstraintInterface,
 } from "class-validator";
-import { getRepository } from "typeorm";
-import { User } from "./user.entity";
+import { Repository } from "typeorm";
+import { User } from "../user.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable } from "@nestjs/common";
 
 @ValidatorConstraint({ async: true })
+@Injectable()
 export class IsUniqueEmailConstraint implements ValidatorConstraintInterface {
+	constructor(
+		@InjectRepository(User) private readonly userRepository: Repository<User>
+	) {}
+
 	async validate(email: any, args: ValidationArguments) {
-		return !(await getRepository(User).findOne({ email: email }));
+		return !(await this.userRepository.findOne({ email: email }));
 	}
 }
 

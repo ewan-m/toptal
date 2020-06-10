@@ -5,7 +5,7 @@ import {
 	ValidatorConstraint,
 	ValidatorConstraintInterface,
 } from "class-validator";
-import { roles } from "./roles.type";
+import { roles } from "../roles.type";
 
 @ValidatorConstraint()
 export class IsRoleConstraint implements ValidatorConstraintInterface {

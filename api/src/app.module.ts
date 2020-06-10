@@ -1,15 +1,20 @@
+import { MailerModule } from "@nestjs-modules/mailer";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { MailerModule } from "@nestjs-modules/mailer";
-
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { AuthController } from "./auth/auth.controller";
+import { IsUniqueEmailConstraint } from "./auth/validators/is-unique-email.validator";
+import { User } from "./auth/user.entity";
+import { HasValidTokenGuard } from "./guards/has-valid-token.guard";
 import config from "./orm-config";
+import { UserPreferencesController } from "./user-preference/user-preferences.controller";
+import { UserPreference } from "./user-preference/user-preferences.entity";
+import { WorkLog } from "./work-log/work-log.entity";
+import { TokenIdMatchesRequestedId } from "./guards/token-id-matches-requested-id.guard";
 
 @Module({
 	imports: [
 		TypeOrmModule.forRoot(config),
+		TypeOrmModule.forFeature([User, UserPreference, WorkLog]),
 		MailerModule.forRoot({
 			transport: {
 				service: "gmail",
@@ -17,7 +22,11 @@ import config from "./orm-config";
 			},
 		}),
 	],
-	controllers: [AppController, AuthController],
-	providers: [AppService],
+	controllers: [AuthController, UserPreferencesController],
+	providers: [
+		HasValidTokenGuard,
+		TokenIdMatchesRequestedId,
+		IsUniqueEmailConstraint,
+	],
 })
 export class AppModule {}

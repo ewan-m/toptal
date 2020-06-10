@@ -1,10 +1,11 @@
 import { ConnectionOptions } from "typeorm";
 import { User } from "./auth/user.entity";
 import { UserPreference } from "./user-preference/user-preferences.entity";
-import { WorkLog } from "./entities/work-log";
-import { First1591454702269 } from "./migrations/1591454702269-First";
+import { WorkLog } from "./work-log/work-log.entity";
+import { CreateTables1591786112692 } from "./migrations/1591786112692-CreateTables";
+import { RenameInvalidColumn1591791275462 } from "./migrations/1591791275462-RenameInvalidColumn";
 
-export default {
+const config = {
 	type: "mssql",
 	username: process.env.DB_USERNAME,
 	password: process.env.DB_PASSWORD,
@@ -15,7 +16,9 @@ export default {
 	options: {
 		enableArithAbort: true,
 	},
-	migrations: [First1591454702269],
+	migrations: [CreateTables1591786112692, RenameInvalidColumn1591791275462],
 	entities: [UserPreference, User, WorkLog],
 	port: 11,
 } as ConnectionOptions;
+
+export = config;

@@ -1,21 +1,27 @@
 import {
-	Column,
 	Entity,
-	JoinColumn,
-	OneToOne,
+	ManyToOne,
 	PrimaryGeneratedColumn,
+	Column,
+	JoinColumn,
 } from "typeorm";
 import { User } from "../auth/user.entity";
 
 @Entity()
-export class UserPreference {
+export class WorkLog {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne((type) => User, { nullable: false })
+	@ManyToOne((type) => User, { nullable: false })
 	@JoinColumn()
 	user: User;
 
+	@Column("varchar")
+	date: string;
+
 	@Column("tinyint")
-	preferredWorkingHourPerDay: number;
+	hoursWorked: number;
+
+	@Column("nvarchar")
+	note: string;
 }

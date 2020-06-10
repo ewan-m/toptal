@@ -1,29 +1,40 @@
+import { MailerService } from "@nestjs-modules/mailer";
 import {
 	Body,
 	Controller,
+	Headers,
 	HttpCode,
+	InternalServerErrorException,
 	Post,
 	Put,
 	UnauthorizedException,
+	UseGuards,
 } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { pbkdf2Sync, randomBytes } from "crypto";
-import { sign } from "jsonwebtoken";
-import { getRepository } from "typeorm";
-import { SignInDto } from "./sign-in.dto";
-import { SignUpDto } from "./sign-up.dto";
+import { decode, sign } from "jsonwebtoken";
+import { HasValidTokenGuard } from "src/guards/has-valid-token.guard";
+import { Repository } from "typeorm";
+import { MagicLinkDto } from "./dto/magic-link.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { SignInDto } from "./dto/sign-in.dto";
+import { SignUpDto } from "./dto/sign-up.dto";
+import { TokenPayload } from "./token-payload.type";
 import { User } from "./user.entity";
-import { MagicLinkDto } from "./magic-link.dto";
-import { MailerService } from "@nestjs-modules/mailer";
 
 @Controller()
 export class AuthController {
-	constructor(private readonly mail: MailerService) {}
+	constructor(
+		private readonly mail: MailerService,
+		@InjectRepository(User)
+		private readonly userRepository: Repository<User>
+	) {}
 
 	@Post("/sign-in")
 	@HttpCode(200)
 	async signIn(@Body() signInDto: SignInDto) {
 		try {
-			const user = await getRepository(User).findOneOrFail({
+			const user = await this.userRepository.findOneOrFail({
 				email: signInDto.email,
 			});
 
@@ -49,7 +60,7 @@ export class AuthController {
 	@HttpCode(200)
 	async sendMagicEmailLink(@Body() magicLinkDto: MagicLinkDto) {
 		try {
-			const user = await getRepository(User).findOne({
+			const user = await this.userRepository.findOne({
 				email: magicLinkDto.email,
 			});
 
@@ -86,11 +97,40 @@ export class AuthController {
 		};
 	}
 
+	@Post("/reset-password")
+	@UseGuards(HasValidTokenGuard)
+	async resetPassword(
+		@Body() resetPasswordDto: ResetPasswordDto,
+		@Headers("authorization") authHeader: string
+	) {
+		const token = authHeader.split(" ")?.[1];
+
+		if (token) {
+			try {
+				const userId = (decode(token) as TokenPayload).id;
+				const user = await this.userRepository.findOneOrFail(userId);
+				const passwordSalt = this.getSalt();
+				user.passwordSalt = passwordSalt;
+				user.passwordHash = this.getPasswordHash(
+					resetPasswordDto.password,
+					passwordSalt
+				);
+				await this.userRepository.save(user);
+
+				return {};
+			} catch (error) {}
+		}
+
+		throw new InternalServerErrorException([
+			"Something went wrong updating your password",
+		]);
+	}
+
 	@Put("/sign-up")
 	async signUp(@Body() signUpDto: SignUpDto) {
 		const user = new User();
 
-		const passwordSalt = randomBytes(64).toString("base64");
+		const passwordSalt = this.getSalt();
 		const passwordHash = this.getPasswordHash(signUpDto.password, passwordSalt);
 
 		user.passwordHash = passwordHash;
@@ -99,14 +139,19 @@ export class AuthController {
 		user.name = signUpDto.name;
 		user.role = signUpDto.role;
 
-		await getRepository(User).save(user);
+		await this.userRepository.save(user);
 
 		return { token: this.getUserToken(user) };
 	}
 
 	private getUserToken(user: User) {
 		return sign(
-			{ email: user.email, name: user.name, role: user.role },
+			{
+				email: user.email,
+				name: user.name,
+				role: user.role,
+				id: user.id,
+			} as TokenPayload,
 			process.env.JWT_SECRET,
 			{ expiresIn: "1d" }
 		);
@@ -114,5 +159,9 @@ export class AuthController {
 
 	private getPasswordHash(password, salt) {
 		return pbkdf2Sync(password, salt, 1000, 64, "sha512").toString("base64");
+	}
+
+	private getSalt() {
+		return randomBytes(64).toString("base64");
 	}
 }

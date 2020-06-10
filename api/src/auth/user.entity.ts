@@ -1,26 +1,25 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { WorkLog } from "../entities/work-log";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column()
+	@Column("nvarchar")
 	name: string;
 
-	@Column()
+	@Column("nvarchar")
 	email: string;
 
-	@Column()
+	@Column("nvarchar")
 	passwordHash: string;
 
-	@Column()
+	@Column("nvarchar")
 	passwordSalt: string;
 
-	@Column()
+	@Column("nvarchar")
 	role: string;
 
-	@OneToMany((type) => WorkLog, (workLog: WorkLog) => workLog.userId)
-	workLogs: WorkLog[];
+	@Column("bit", { default: 0 })
+	isDeleted: boolean;
 }
