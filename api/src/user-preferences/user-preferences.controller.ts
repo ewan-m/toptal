@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { UserPreference } from "./user-preferences.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../auth/user.entity";
-import { TokenIdMatchesRequestedId } from "src/guards/token-id-matches-requested-id.guard";
+import { TokenIdMatchesRequestedIdGuard } from "../guards/token-id-matches-requested-id.guard";
 import { UserPreferencesDto } from "./user-preferences.dto";
 
 @Controller()
@@ -17,7 +17,7 @@ export class UserPreferencesController {
 	) {}
 
 	@Get("/user-preferences/:userId")
-	@UseGuards(HasValidTokenGuard, TokenIdMatchesRequestedId)
+	@UseGuards(HasValidTokenGuard, TokenIdMatchesRequestedIdGuard)
 	async getPreferredHours(@Param() { userId }) {
 		const result = await this.userPreferenceRepository.findOne({
 			user: { id: userId },
@@ -27,7 +27,7 @@ export class UserPreferencesController {
 	}
 
 	@Post("/user-preferences/:userId")
-	@UseGuards(HasValidTokenGuard, TokenIdMatchesRequestedId)
+	@UseGuards(HasValidTokenGuard, TokenIdMatchesRequestedIdGuard)
 	async updatePreferredHours(
 		@Param() { userId },
 		@Body() userPreferencesDto: UserPreferencesDto

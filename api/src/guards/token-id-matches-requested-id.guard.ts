@@ -8,7 +8,7 @@ import { decode } from "jsonwebtoken";
 import { TokenPayload } from "src/auth/token-payload.type";
 
 @Injectable()
-export class TokenIdMatchesRequestedId implements CanActivate {
+export class TokenIdMatchesRequestedIdGuard implements CanActivate {
 	canActivate(context: ExecutionContext) {
 		const request = context.switchToHttp().getRequest();
 		const requestingId = request?.params?.userId;

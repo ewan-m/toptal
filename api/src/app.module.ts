@@ -9,7 +9,8 @@ import config from "./orm-config";
 import { UserPreferencesController } from "./user-preferences/user-preferences.controller";
 import { UserPreference } from "./user-preferences/user-preferences.entity";
 import { WorkLog } from "./work-log/work-log.entity";
-import { TokenIdMatchesRequestedId } from "./guards/token-id-matches-requested-id.guard";
+import { TokenIdMatchesRequestedIdGuard } from "./guards/token-id-matches-requested-id.guard";
+import { IsNotUserManagerGuard } from "./guards/is-not-user-manager.guard";
 
 @Module({
 	imports: [
@@ -25,8 +26,9 @@ import { TokenIdMatchesRequestedId } from "./guards/token-id-matches-requested-i
 	controllers: [AuthController, UserPreferencesController],
 	providers: [
 		HasValidTokenGuard,
-		TokenIdMatchesRequestedId,
+		TokenIdMatchesRequestedIdGuard,
 		IsUniqueEmailConstraint,
+		IsNotUserManagerGuard,
 	],
 })
 export class AppModule {}

@@ -6,7 +6,6 @@ import {
 	HttpCode,
 	InternalServerErrorException,
 	Post,
-	Put,
 	UnauthorizedException,
 	UseGuards,
 } from "@nestjs/common";
@@ -126,7 +125,7 @@ export class AuthController {
 		]);
 	}
 
-	@Put("/sign-up")
+	@Post("/sign-up")
 	async signUp(@Body() signUpDto: SignUpDto) {
 		const user = new User();
 
