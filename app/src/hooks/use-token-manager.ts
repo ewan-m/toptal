@@ -1,4 +1,12 @@
 import { decode } from "jsonwebtoken";
+import { Role } from "../constants/roles";
+
+export type TokenPayload = {
+	role: Role;
+	name: string;
+	email: string;
+	id: number;
+};
 
 export const useTokenManager = () => {
 	const tokenStorageKey = "TOKEN";
@@ -8,16 +16,28 @@ export const useTokenManager = () => {
 		sessionStorage.setItem(tokenStorageKey, token);
 	const removeToken = () => sessionStorage.removeItem(tokenStorageKey);
 
-	const getUserDetails = () => {
+	const getUserDetails = (): TokenPayload | null => {
 		const token = getToken();
 
 		if (token) {
 			const parsed = decode(token);
-			return parsed;
+			return parsed as TokenPayload;
 		}
-		return {};
+		return null;
 	};
+
+	const getUserId = () => {
+		return getUserDetails()?.["id"];
+	};
+
 	const isLoggedIn = () => !!getToken();
 
-	return { getToken, setToken, removeToken, getUserDetails, isLoggedIn };
+	return {
+		getToken,
+		setToken,
+		removeToken,
+		getUserDetails,
+		isLoggedIn,
+		getUserId,
+	};
 };

@@ -10,6 +10,9 @@ body {
 	text-rendering: optimizeLegibility;
 	font-weight: 300;
 	margin: 0;
+	background-color: $white;
+	color: $darkestGrey;
+	overflow-y: auto !important;
 }
 
 .h-100 {

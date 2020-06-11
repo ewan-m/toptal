@@ -20,7 +20,7 @@ export const useHttpClient = () => {
 			...headers,
 			"mode": "cors",
 			"Content-Type": "application/json",
-			...(withAuth ? { Authorization: tokenManager.getToken() } : {}),
+			...(withAuth ? { Authorization: `Bearer ${tokenManager.getToken()}` } : {}),
 		};
 		body = JSON.stringify(body);
 

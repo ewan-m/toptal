@@ -20,6 +20,7 @@
 
 	&:disabled {
 		opacity: 0.4;
+		cursor: disabled !important;
 	}
 
 	&__primary {
@@ -46,5 +47,15 @@
 	&--stacked {
 		display: block;
 		margin-bottom: $size0;
+	}
+}
+
+.buttonRow {
+	display: flex;
+	flex-wrap: wrap;
+	margin: -$size-3;
+
+	> .button {
+		margin: $size-3;
 	}
 }
