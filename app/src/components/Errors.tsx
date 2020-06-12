@@ -3,6 +3,9 @@ import { FunctionComponent } from "react";
 import { Icon } from "./Icon";
 
 export const Errors: FunctionComponent<{ errors: string[] }> = ({ errors }) => {
+	if (typeof errors === "string") {
+		errors = [errors];
+	}
 	const formatError = (error: string) => {
 		return `${error[0].toUpperCase()}${error.substring(1)}${
 			error[error.length - 1] === "." ? "" : "."
