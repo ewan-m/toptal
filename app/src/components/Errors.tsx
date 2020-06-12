@@ -8,9 +8,9 @@ export const Errors: FunctionComponent<{ errors: string[] }> = ({ errors }) => {
 			error[error.length - 1] === "." ? "" : "."
 		}`;
 	};
-	return errors?.length > 0 ? (
+	return Array.isArray(errors) && errors.length > 0 ? (
 		<>
-			{errors?.map((error) => (
+			{errors.map((error) => (
 				<p key={error} className="paragraph paragraph--error">
 					<Icon withMargin="left">error</Icon>
 					{formatError(error)}
