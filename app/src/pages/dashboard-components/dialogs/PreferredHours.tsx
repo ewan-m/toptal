@@ -1,10 +1,12 @@
 import * as React from "react";
 import { MouseEvent, useEffect, useState } from "react";
-import SuccessImage from "../../assets/illustrations/fast_working_monochromatic.svg";
-import { Errors } from "../../components/Errors";
-import { Icon } from "../../components/Icon";
-import { useHttpClient } from "../../hooks/use-http-client";
-import { useTokenManager } from "../../hooks/use-token-manager";
+import { useRecoilValue } from "recoil";
+import SuccessImage from "../../../assets/illustrations/fast_working_monochromatic.svg";
+import { Errors } from "../../../components/Errors";
+import { Icon } from "../../../components/Icon";
+import { LoadingSpinner } from "../../../components/LoadingSpinner";
+import { useHttpClient } from "../../../hooks/use-http-client";
+import { selectToken, selectUserDetails } from "../../../store/auth.state";
 
 enum State {
 	Unset,
@@ -19,14 +21,14 @@ export const PreferredHours = () => {
 	const [hours, setHours] = useState(1);
 	const [errors, setErrors] = useState([] as string[]);
 	const http = useHttpClient();
-	const tokenManager = useTokenManager();
+	const userDetails = useRecoilValue(selectUserDetails);
 
 	useEffect(() => {
 		(async () => {
 			try {
 				const result = await http.request({
 					method: "GET",
-					uri: `user-preferences/${tokenManager.getUserId()}`,
+					uri: `user-preferences/${userDetails?.id}`,
 					withAuth: true,
 				});
 				if (result.preferredHours) {
@@ -45,12 +47,13 @@ export const PreferredHours = () => {
 		e.preventDefault();
 		const previousSituation = situation;
 		setSituation(State.Saving);
+		setErrors([]);
 
 		(async () => {
 			try {
 				const result = await http.request({
 					method: "POST",
-					uri: `user-preferences/${tokenManager.getUserId()}`,
+					uri: `user-preferences/${userDetails?.id}`,
 					withAuth: true,
 					body: { preferredHours: hours },
 				});
@@ -58,7 +61,11 @@ export const PreferredHours = () => {
 					setSituation(State.Saved);
 				} else {
 					if (result.error) {
-						setErrors(result.message);
+						setErrors(
+							Array.isArray(result.message)
+								? result.message
+								: ["Something went wrong saving your preferred hours."]
+						);
 					}
 					setSituation(previousSituation);
 				}
@@ -72,7 +79,9 @@ export const PreferredHours = () => {
 	return (
 		<>
 			{situation === State.Loading && (
-				<p className="paragraph">Fetching your preferred hours.</p>
+				<p className="paragraph paragraph--hero">
+					<LoadingSpinner />
+				</p>
 			)}
 			{situation === State.Saved && (
 				<>
@@ -92,8 +101,8 @@ export const PreferredHours = () => {
 			{[State.Set, State.Unset, State.Saving].includes(situation) && (
 				<>
 					<p className="paragraph">
-						Choosing this makes it easy to see which days you have worked
-						fewer hours than you want to.
+						Choosing this makes it easy to see which days you have worked fewer hours
+						than you want to.
 					</p>
 					<form>
 						<label className="form__label">
@@ -121,7 +130,7 @@ export const PreferredHours = () => {
 							type="submit"
 							disabled={situation === State.Saving}
 						>
-							<Icon withMargin="left">schedule</Icon>Save preferred working hours
+							<Icon withMargin="left">schedule</Icon>Save preferred hours
 						</button>
 						<Errors errors={errors} />
 					</form>
