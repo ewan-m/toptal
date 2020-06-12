@@ -8,7 +8,7 @@
 	text-decoration: none;
 	z-index: 2;
 	transition-property: transform, opacity;
-	transition-duration: 0.3s;
+	transition-duration: 0.2s;
 	transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 	transform: scale(1);
 	padding: $size-3 $size0;
@@ -20,7 +20,7 @@
 
 	&:disabled {
 		opacity: 0.4;
-		cursor: disabled !important;
+		cursor: not-allowed;
 	}
 
 	&__primary {
@@ -31,7 +31,13 @@
 	&__secondary {
 		background: $lightGrey;
 		color: $darkGrey;
-		border: 1px solid $grey;
+		box-shadow: 0px 0px 1px 1px $grey;
+	}
+
+	&__destructive {
+		background: $error;
+		color: $white;
+		box-shadow: 0px 0px 1px 1px $grey;
 	}
 
 	&--large {
