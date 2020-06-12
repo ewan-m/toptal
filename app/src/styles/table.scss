@@ -1,0 +1,20 @@
+@import "./variables.scss";
+
+.table {
+	width: 100%;
+	box-shadow: $shadow5px;
+	border-radius: $size0;
+	margin: $size3 0;
+	padding: $size2;
+
+	text-align: left;
+
+	th,
+	td {
+		padding: $size-3;
+	}
+
+	&__cell--fixedWidth {
+		width: 80px;
+	}
+}
