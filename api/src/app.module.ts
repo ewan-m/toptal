@@ -2,15 +2,16 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthController } from "./auth/auth.controller";
-import { IsUniqueEmailConstraint } from "./auth/validators/is-unique-email.validator";
 import { User } from "./auth/user.entity";
+import { IsUniqueEmailConstraint } from "./auth/validators/is-unique-email.validator";
 import { HasValidTokenGuard } from "./guards/has-valid-token.guard";
+import { IsNotUserManagerGuard } from "./guards/is-not-user-manager.guard";
+import { TokenIdMatchesRequestedIdGuard } from "./guards/token-id-matches-requested-id.guard";
 import config from "./orm-config";
 import { UserPreferencesController } from "./user-preferences/user-preferences.controller";
 import { UserPreference } from "./user-preferences/user-preferences.entity";
+import { WorkLogController } from "./work-log/work-log.controller";
 import { WorkLog } from "./work-log/work-log.entity";
-import { TokenIdMatchesRequestedIdGuard } from "./guards/token-id-matches-requested-id.guard";
-import { IsNotUserManagerGuard } from "./guards/is-not-user-manager.guard";
 
 @Module({
 	imports: [
@@ -23,7 +24,7 @@ import { IsNotUserManagerGuard } from "./guards/is-not-user-manager.guard";
 			},
 		}),
 	],
-	controllers: [AuthController, UserPreferencesController],
+	controllers: [AuthController, UserPreferencesController, WorkLogController],
 	providers: [
 		HasValidTokenGuard,
 		TokenIdMatchesRequestedIdGuard,

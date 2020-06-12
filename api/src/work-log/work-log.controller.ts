@@ -1,30 +1,32 @@
 import {
+	BadRequestException,
+	Body,
 	Controller,
-	Get,
-	UseGuards,
-	Headers,
 	Delete,
+	ForbiddenException,
+	Get,
+	Headers,
+	InternalServerErrorException,
+	NotFoundException,
 	Param,
 	Patch,
 	Post,
-	Put,
-	Body,
-	InternalServerErrorException,
-	ForbiddenException,
-	BadRequestException,
-	NotFoundException,
+	Query,
+	UseGuards,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { WorkLog } from "./work-log.entity";
-import { Repository } from "typeorm";
-import { HasValidTokenGuard } from "../guards/has-valid-token.guard";
-import { WorkLogDto } from "./work-log.dto";
 import { decode } from "jsonwebtoken";
-import { TokenPayload } from "src/auth/token-payload.type";
-import { IsNotUserManagerGuard } from "src/guards/is-not-user-manager.guard";
+import moment from "moment";
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
+import { TokenPayload } from "../auth/token-payload.type";
+import { User } from "../auth/user.entity";
+import { HasValidTokenGuard } from "../guards/has-valid-token.guard";
+import { IsNotUserManagerGuard } from "../guards/is-not-user-manager.guard";
+import { WorkLogDto } from "./work-log.dto";
+import { WorkLog } from "./work-log.entity";
 
 @Controller()
-export class UserPreferencesController {
+export class WorkLogController {
 	constructor(
 		@InjectRepository(WorkLog)
 		private readonly workLogRepository: Repository<WorkLog>
@@ -32,22 +34,103 @@ export class UserPreferencesController {
 
 	@Get("/work-log")
 	@UseGuards(HasValidTokenGuard, IsNotUserManagerGuard)
-	async getWorkLogs(@Headers("authorization") authHeader: string) {}
+	async getWorkLogs(
+		@Headers("authorization") authHeader: string,
+		@Query("from") from?: string,
+		@Query("to") to?: string
+	) {
+		if (from) {
+			const fromMoment = moment(from, "YYYY-MM-DD");
+			if (!fromMoment.isValid()) {
+				throw new BadRequestException([
+					"The 'from' date needs to be in the format YYYY-MM-DD",
+				]);
+			}
+		}
+		if (to) {
+			const toMoment = moment(from, "YYYY-MM-DD");
+			if (!toMoment.isValid()) {
+				throw new BadRequestException([
+					"The 'to' date needs to be in the format YYYY-MM-DD",
+				]);
+			}
+		}
+		const token = this.parseToken(authHeader);
+
+		const result = this.workLogRepository.find({
+			where: {
+				...(token.role === "admin" ? {} : { user: { id: token.id } }),
+				...(from && !to ? { date: MoreThanOrEqual(from) } : {}),
+				...(to && !from ? { date: LessThanOrEqual(to) } : {}),
+				...(from && to ? { date: Between(from, to) } : {}),
+			},
+		});
+
+		return result;
+	}
+
+	@Get("/work-log/:recordId")
+	@UseGuards(HasValidTokenGuard, IsNotUserManagerGuard)
+	async getWorkLog(
+		@Headers("authorization") authHeader: string,
+		@Param() { recordId }
+	) {
+		const matchingRecord = await this.workLogRepository.findOne({ id: recordId });
+
+		if (!matchingRecord) {
+			throw new NotFoundException();
+		}
+		const token = this.parseToken(authHeader);
+		const userId = token.id;
+
+		if (token.role === "user" && matchingRecord.user.id !== userId) {
+			throw new ForbiddenException(["Insufficient permissions to view record."]);
+		}
+		return matchingRecord;
+	}
 
 	@Post("/work-log")
 	@UseGuards(HasValidTokenGuard, IsNotUserManagerGuard)
 	async createWorkLog(
 		@Headers("authorization") authHeader: string,
 		@Body() workLogDto: WorkLogDto
-	) {}
+	) {
+		const token = this.parseToken(authHeader);
+		const userId = token.id;
 
-	@Put("/work-log/:recordId")
+		const workLog = new WorkLog();
+		workLog.user = { id: userId } as User;
+		workLog.note = workLogDto.note;
+		workLog.hoursWorked = workLogDto.hoursWorked;
+		workLog.date = workLogDto.date;
+
+		return this.workLogRepository.save(workLog);
+	}
+
+	@Patch("/work-log/:recordId")
 	@UseGuards(HasValidTokenGuard, IsNotUserManagerGuard)
 	async updateWorkLog(
 		@Headers("authorization") authHeader: string,
 		@Param() { recordId },
 		@Body() workLogDto: WorkLogDto
-	) {}
+	) {
+		const matchingRecord = await this.workLogRepository.findOne({ id: recordId });
+
+		if (!matchingRecord) {
+			throw new NotFoundException();
+		}
+		const token = this.parseToken(authHeader);
+		const userId = token.id;
+
+		if (token.role === "user" && matchingRecord.user.id !== userId) {
+			throw new ForbiddenException(["Insufficient permissions to update record."]);
+		}
+		matchingRecord.note = workLogDto.note;
+		matchingRecord.hoursWorked = workLogDto.hoursWorked;
+		matchingRecord.date = workLogDto.date;
+
+		return this.workLogRepository.save(matchingRecord);
+	}
 
 	@Delete("/work-log/:recordId")
 	@UseGuards(HasValidTokenGuard, IsNotUserManagerGuard)
@@ -55,7 +138,9 @@ export class UserPreferencesController {
 		@Headers("authorization") authHeader: string,
 		@Param() { recordId }
 	) {
-		const matchingRecord = await this.workLogRepository.findOne({ id: recordId });
+		const matchingRecord = await this.workLogRepository.findOne({
+			id: recordId,
+		});
 
 		if (!matchingRecord) {
 			throw new NotFoundException();

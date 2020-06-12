@@ -33,9 +33,22 @@ export class AuthController {
 	@HttpCode(200)
 	async signIn(@Body() signInDto: SignInDto) {
 		try {
-			const user = await this.userRepository.findOneOrFail({
-				email: signInDto.email,
-			});
+			const user = await this.userRepository.findOneOrFail(
+				{
+					email: signInDto.email,
+				},
+				{
+					select: [
+						"id",
+						"email",
+						"isDeleted",
+						"name",
+						"passwordHash",
+						"passwordSalt",
+						"role",
+					],
+				}
+			);
 
 			const isPasswordCorrect =
 				this.getPasswordHash(signInDto.password, user.passwordSalt) ===
@@ -107,7 +120,9 @@ export class AuthController {
 		if (token) {
 			try {
 				const userId = (decode(token) as TokenPayload).id;
-				const user = await this.userRepository.findOneOrFail(userId);
+				const user = await this.userRepository.findOneOrFail(userId, {
+					select: ["passwordHash", "passwordSalt"],
+				});
 				const passwordSalt = this.getSalt();
 				user.passwordSalt = passwordSalt;
 				user.passwordHash = this.getPasswordHash(

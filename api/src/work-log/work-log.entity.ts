@@ -12,11 +12,11 @@ export class WorkLog {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne((type) => User, { nullable: false })
+	@ManyToOne((type) => User, { nullable: false, eager: true })
 	@JoinColumn()
 	user: User;
 
-	@Column("varchar")
+	@Column("datetime")
 	date: string;
 
 	@Column("tinyint")

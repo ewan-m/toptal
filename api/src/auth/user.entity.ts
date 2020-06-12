@@ -11,10 +11,10 @@ export class User {
 	@Column("nvarchar")
 	email: string;
 
-	@Column("nvarchar")
+	@Column("nvarchar", { select: false })
 	passwordHash: string;
 
-	@Column("nvarchar")
+	@Column("nvarchar", { select: false })
 	passwordSalt: string;
 
 	@Column("nvarchar")
