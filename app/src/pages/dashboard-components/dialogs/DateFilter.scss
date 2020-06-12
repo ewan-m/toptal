@@ -1,0 +1,10 @@
+@import "../../../styles/variables.scss";
+
+.dateFilter__row {
+	display: flex;
+	justify-content: space-between;
+}
+.dateFilter__container {
+	width: 100%;
+	padding-right: $size0;
+}
