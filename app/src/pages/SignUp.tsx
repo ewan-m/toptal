@@ -1,12 +1,13 @@
 import * as React from "react";
+import { MouseEvent, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useState, MouseEvent } from "react";
-import { roles, Role } from "../constants/roles";
-import { useHttpClient } from "../hooks/use-http-client";
-import { useTokenManager } from "../hooks/use-token-manager";
-import { Icon } from "../components/Icon";
-import { Errors } from "../components/Errors";
+import { useRecoilState } from "recoil";
 import SignUpImage from "../assets/illustrations/receptionist_monochromatic.svg";
+import { Errors } from "../components/Errors";
+import { Icon } from "../components/Icon";
+import { Role, roles } from "../constants/roles.type";
+import { useHttpClient } from "../hooks/use-http-client";
+import { tokenAtom } from "../store/auth.state";
 
 export const SignUp = () => {
 	const [name, setName] = useState("");
@@ -14,11 +15,12 @@ export const SignUp = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [errors, setErrors] = useState([] as string[]);
+
+	const [_, setToken] = useRecoilState(tokenAtom);
 	const [isSendingRequest, setIsSendingRequest] = useState(false);
 
 	const history = useHistory();
 	const http = useHttpClient();
-	const tokenManager = useTokenManager();
 
 	const onSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
@@ -27,7 +29,7 @@ export const SignUp = () => {
 
 		try {
 			const result = await http.request({
-				method: "PUT",
+				method: "POST",
 				uri: "sign-up",
 				body: { email, password, name, role },
 				withAuth: false,
@@ -35,7 +37,7 @@ export const SignUp = () => {
 
 			setIsSendingRequest(false);
 			if (result.token) {
-				tokenManager.setToken(result.token);
+				setToken(result.token);
 				history.push("/dashboard");
 			}
 

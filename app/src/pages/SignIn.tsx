@@ -1,25 +1,28 @@
 import * as React from "react";
-import { Link, useHistory, useParams, useLocation } from "react-router-dom";
-import { useState, MouseEvent, useEffect } from "react";
-import { useHttpClient } from "../hooks/use-http-client";
-import { useTokenManager } from "../hooks/use-token-manager";
-import { Icon } from "../components/Icon";
-import { Errors } from "../components/Errors";
+import { MouseEvent, useEffect, useState } from "react";
+import { Link, useHistory, useLocation } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import SignInImage from "../assets/illustrations/authentication_monochromatic.svg";
+import { Errors } from "../components/Errors";
+import { Icon } from "../components/Icon";
+import { useHttpClient } from "../hooks/use-http-client";
+import { tokenAtom } from "../store/auth.state";
 
 export const SignIn = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [errors, setErrors] = useState([] as string[]);
 	const [isSendingRequest, setIsSendingRequest] = useState(false);
+
+	const [_, setToken] = useRecoilState(tokenAtom);
+
 	const token = new URLSearchParams(useLocation().search).get("token");
 	const http = useHttpClient();
-	const tokenManager = useTokenManager();
 	const history = useHistory();
 
 	useEffect(() => {
 		if (token) {
-			tokenManager.setToken(token);
+			setToken(token);
 			history.push("/dashboard");
 		}
 	}, [token]);
@@ -39,7 +42,7 @@ export const SignIn = () => {
 
 			setIsSendingRequest(false);
 			if (result.token) {
-				tokenManager.setToken(result.token);
+				setToken(result.token);
 				history.push("/dashboard");
 			}
 

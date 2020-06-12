@@ -1,23 +1,26 @@
 import * as React from "react";
-import { FunctionComponent, useEffect, useState } from "react";
-import "./SiteContainer.scss";
+import { FunctionComponent } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useTokenManager } from "../hooks/use-token-manager";
+import { useRecoilState } from "recoil";
+import { useStateSynchronizer } from "../hooks/use-state-synchronizer";
+import { selectToken, tokenAtom, TOKEN_SYNC_KEY } from "../store/auth.state";
 import { Icon } from "./Icon";
+import "./SiteContainer.scss";
+import {
+	DATE_FILTER_SYNC_KEY,
+	selectDateFilter,
+} from "../store/work-log-filter.state";
 
 export const SiteContainer: FunctionComponent = ({ children }) => {
-	const tokenManager = useTokenManager();
 	const history = useHistory();
-	const [isSignedIn, setIsSignedIn] = useState(tokenManager.isLoggedIn());
+	const [token, setToken] = useRecoilState(tokenAtom);
+	useStateSynchronizer(TOKEN_SYNC_KEY, selectToken);
+	useStateSynchronizer(DATE_FILTER_SYNC_KEY, selectDateFilter);
 
 	const signOut = () => {
-		tokenManager.removeToken();
+		setToken("");
 		history.push("/");
 	};
-
-	history.listen(() => {
-		setIsSignedIn(tokenManager.isLoggedIn());
-	});
 
 	return (
 		<div className="siteContainer">
@@ -29,7 +32,7 @@ export const SiteContainer: FunctionComponent = ({ children }) => {
 							<span style={{ fontWeight: 500 }}>hour</span>
 						</h1>
 					</Link>
-					{isSignedIn && (
+					{!!token && (
 						<nav className="siteHeader__nav">
 							<Link className="siteHeader__a siteHeader__nav__link" to="/account">
 								Account
@@ -39,7 +42,7 @@ export const SiteContainer: FunctionComponent = ({ children }) => {
 							</button>
 						</nav>
 					)}
-					{!isSignedIn && (
+					{!token && (
 						<nav className="siteHeader__nav">
 							<Link to="/sign-up" className="siteHeader__a siteHeader__nav__link">
 								Sign up

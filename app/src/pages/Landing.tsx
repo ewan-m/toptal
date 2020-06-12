@@ -1,14 +1,14 @@
 import * as React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useTokenManager } from "../hooks/use-token-manager";
-import { Icon } from "../components/Icon";
+import { useRecoilValue } from "recoil";
 import HeroImage from "../assets/illustrations/innovation__monochromatic.svg";
+import { Icon } from "../components/Icon";
+import { selectToken } from "../store/auth.state";
 
 export const Landing = () => {
 	const history = useHistory();
-	const tokenManager = useTokenManager();
-
-	if (tokenManager.getToken()) {
+	const token = useRecoilValue(selectToken);
+	if (token) {
 		history.push("/dashboard");
 	}
 

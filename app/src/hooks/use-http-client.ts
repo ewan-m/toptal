@@ -1,9 +1,9 @@
+import { useRecoilValue } from "recoil";
 import { environment } from "../environment";
-import { useHistory } from "react-router-dom";
-import { useTokenManager } from "./use-token-manager";
+import { selectToken } from "../store/auth.state";
 
 interface Request {
-	method: string;
+	method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 	uri: string;
 	headers?: any;
 	body?: any;
@@ -11,8 +11,7 @@ interface Request {
 }
 
 export const useHttpClient = () => {
-	const history = useHistory();
-	const tokenManager = useTokenManager();
+	const token = useRecoilValue(selectToken);
 
 	const request = async ({ method, uri, headers, body, withAuth }: Request) => {
 		const url = environment.apiUrl + uri;
@@ -20,7 +19,7 @@ export const useHttpClient = () => {
 			...headers,
 			"mode": "cors",
 			"Content-Type": "application/json",
-			...(withAuth ? { Authorization: `Bearer ${tokenManager.getToken()}` } : {}),
+			...(withAuth ? { Authorization: `Bearer ${token}` } : {}),
 		};
 		body = JSON.stringify(body);
 
