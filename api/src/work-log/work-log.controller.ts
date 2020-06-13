@@ -1,5 +1,4 @@
 import {
-	BadRequestException,
 	Body,
 	Controller,
 	Delete,
@@ -16,12 +15,12 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { decode } from "jsonwebtoken";
-import moment from "moment";
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { TokenPayload } from "../auth/token-payload.type";
 import { User } from "../auth/user.entity";
 import { HasValidTokenGuard } from "../guards/has-valid-token.guard";
 import { IsNotUserManagerGuard } from "../guards/is-not-user-manager.guard";
+import { DateFilterDto, getDateQuery } from "./date-filter.dto";
 import { WorkLogDto } from "./work-log.dto";
 import { WorkLog } from "./work-log.entity";
 
@@ -36,33 +35,16 @@ export class WorkLogController {
 	@UseGuards(HasValidTokenGuard, IsNotUserManagerGuard)
 	async getWorkLogs(
 		@Headers("authorization") authHeader: string,
-		@Query("from") from?: string,
-		@Query("to") to?: string
+		@Query() dateFilter?: DateFilterDto
 	) {
-		if (from) {
-			const fromMoment = moment(from, "YYYY-MM-DD");
-			if (!fromMoment.isValid()) {
-				throw new BadRequestException([
-					"The 'from' date needs to be in the format YYYY-MM-DD",
-				]);
-			}
-		}
-		if (to) {
-			const toMoment = moment(from, "YYYY-MM-DD");
-			if (!toMoment.isValid()) {
-				throw new BadRequestException([
-					"The 'to' date needs to be in the format YYYY-MM-DD",
-				]);
-			}
-		}
 		const token = this.parseToken(authHeader);
 
 		const result = this.workLogRepository.find({
 			where: {
 				...(token.role === "admin" ? {} : { user: { id: token.id } }),
-				...(from && !to ? { date: MoreThanOrEqual(from) } : {}),
-				...(to && !from ? { date: LessThanOrEqual(to) } : {}),
-				...(from && to ? { date: Between(from, to) } : {}),
+				...(dateFilter?.from || dateFilter?.to
+					? { date: getDateQuery(dateFilter) }
+					: {}),
 			},
 		});
 
