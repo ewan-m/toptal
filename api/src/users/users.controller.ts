@@ -18,7 +18,7 @@ import { CreateUserDto } from "./create-user.dto";
 import { UpdateUserDto } from "./update-user.dto";
 
 @Controller()
-export class UserPreferencesController {
+export class UsersController {
 	constructor(
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>

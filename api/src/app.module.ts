@@ -12,6 +12,7 @@ import { UserPreferencesController } from "./user-preferences/user-preferences.c
 import { UserPreference } from "./user-preferences/user-preferences.entity";
 import { WorkLogController } from "./work-log/work-log.controller";
 import { WorkLog } from "./work-log/work-log.entity";
+import { UsersController } from "./users/users.controller";
 
 @Module({
 	imports: [
@@ -24,7 +25,12 @@ import { WorkLog } from "./work-log/work-log.entity";
 			},
 		}),
 	],
-	controllers: [AuthController, UserPreferencesController, WorkLogController],
+	controllers: [
+		AuthController,
+		UsersController,
+		UserPreferencesController,
+		WorkLogController,
+	],
 	providers: [
 		HasValidTokenGuard,
 		TokenIdMatchesRequestedIdGuard,

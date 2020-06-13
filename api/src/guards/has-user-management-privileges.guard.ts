@@ -14,11 +14,10 @@ export class HasUserManagementPrivileges implements CanActivate {
 		const requestingId = request?.params?.userId;
 		const authToken = request?.headers?.["authorization"]?.split(" ")?.[1];
 
-		if (authToken && requestingId !== null && requestingId !== undefined) {
+		if (authToken) {
 			const tokenPayload = decode(authToken) as TokenPayload;
-
 			if (
-				requestingId.toString() === tokenPayload?.id.toString() ||
+				(requestingId && requestingId.toString() === tokenPayload?.id.toString()) ||
 				(tokenPayload?.role && tokenPayload?.role !== "user")
 			) {
 				return true;
