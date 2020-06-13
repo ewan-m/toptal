@@ -18,6 +18,7 @@ import { MagicLinkDto } from "./dto/magic-link.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { SignInDto } from "./dto/sign-in.dto";
 import { SignUpDto } from "./dto/sign-up.dto";
+import { getEmailBody } from "./helpers/get-email-body";
 import { TokenPayload } from "./token-payload.type";
 import { User } from "./user.entity";
 
@@ -83,22 +84,7 @@ export class AuthController {
 					from: `'Glasshour' <${process.env.EMAIL_USER}>`,
 					to: magicLinkDto.email,
 					subject: "Glasshour Sign In Link",
-					html: `
-	<h1>
-		Glasshour Sign In Link
-	</h1>
-	<p>
-		Hi ${user.name},
-	</p>
-	<p style="max-width: 60ch;">
-		To sign in to your account simply use the following magic link to be automatically signed in. It would be a good idea to then change your password once you've successfully signed in.
-	</p>
-	<p>
-		<a href="${process.env.APPLICATION_URL}/sign-in?token=${token}">Sign in to Glasshour</a>
-	</p>
-	<p>
-	Glasshour ❤️
-	</p>`,
+					html: getEmailBody(user.name, token),
 				});
 			}
 		} catch (error) {}
