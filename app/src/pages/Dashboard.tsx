@@ -8,10 +8,10 @@ import { Modal } from "../components/Modal";
 import { useHttpClient } from "../hooks/use-http-client";
 import { selectUserDetails } from "../store/auth.state";
 import { selectDateFilter } from "../store/work-log-filter.state";
-import { DateFilter } from "./dashboard-dialogs/DateFilter";
-import { DeleteResource } from "./dashboard-dialogs/DeleteResource";
-import { PreferredHours } from "./dashboard-dialogs/PreferredHours";
-import { WorkLog } from "./dashboard-dialogs/WorkLog";
+import { DateFilter } from "./dialogs/DateFilter";
+import { DeleteResource } from "./dialogs/DeleteResource";
+import { PreferredHours } from "./dialogs/PreferredHours";
+import { WorkLog } from "./dialogs/WorkLog";
 
 type ModalWindows = "none" | "work" | "hours" | "delete" | "filter";
 

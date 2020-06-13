@@ -34,8 +34,8 @@ export const SiteContainer: FunctionComponent = ({ children }) => {
 					</Link>
 					{!!token && (
 						<nav className="siteHeader__nav">
-							<Link className="siteHeader__a siteHeader__nav__link" to="/account">
-								Account
+							<Link className="siteHeader__a siteHeader__nav__link" to="/user">
+								User
 							</Link>
 							<button onClick={signOut} className="button button__secondary">
 								<Icon withMargin="left">person</Icon>Sign out

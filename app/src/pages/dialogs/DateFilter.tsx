@@ -19,7 +19,6 @@ export const DateFilter: DialogComponent = ({ closeDialog }) => {
 	const saveFilter = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		setFilter({ from, to });
-		closeDialog();
 	};
 	const removeFilter = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
@@ -37,7 +36,6 @@ export const DateFilter: DialogComponent = ({ closeDialog }) => {
 							type="date"
 							value={from}
 							onChange={(e) => {
-								console.log(e.target.value);
 								setFrom(e.target.value);
 							}}
 							max={to}
@@ -51,7 +49,6 @@ export const DateFilter: DialogComponent = ({ closeDialog }) => {
 							type="date"
 							value={to}
 							onChange={(e) => {
-								console.log(e.target.value);
 								setTo(e.target.value);
 							}}
 							min={from}

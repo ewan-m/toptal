@@ -12,6 +12,7 @@ import { MagicLink } from "./pages/MagicLink";
 import "./pages/Page.scss";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
+import { UserManager } from "./pages/UserManager";
 
 const history = createBrowserHistory();
 
@@ -25,6 +26,7 @@ const Index = () => (
 					<Route path="/sign-up" exact component={SignUp} />
 					<Route path="/magic-link" exact component={MagicLink} />
 					<Route path="/dashboard" exact component={Dashboard} />
+					<Route path="/user" exact component={UserManager} />
 					<Route component={Four04} />
 				</Switch>
 			</SiteContainer>

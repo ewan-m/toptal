@@ -1,10 +1,10 @@
-import moment from "moment";
 import * as React from "react";
 import { MouseEvent, useEffect, useState } from "react";
 import SuccessImage from "../../assets/illustrations/focused_working__monochromatic.svg";
 import { Errors } from "../../components/Errors";
 import { Icon } from "../../components/Icon";
 import { useHttpClient } from "../../hooks/use-http-client";
+import { Role, roles } from "../../types/roles.type";
 import { DialogComponent } from "./dialog-component.interface";
 
 enum Situation {
@@ -13,26 +13,21 @@ enum Situation {
 	Saved,
 }
 
-export const WorkLog: DialogComponent<{ workLog: any }> = ({
-	workLog,
-	closeDialog,
-}) => {
-	const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
-	const [note, setNote] = useState("");
-	const [hoursWorked, setHoursWorked] = useState(1);
+export const User: DialogComponent<{ user: any }> = ({ user, closeDialog }) => {
+	const [name, setName] = useState("");
+	const [email, setEmail] = useState("");
+	const [role, setRole] = useState("user" as Role);
 	const [errors, setErrors] = useState([] as string[]);
 	const [situation, setSituation] = useState(Situation.Ready);
 
 	useEffect(() => {
-		if (workLog?.date) {
-			setDate(moment(workLog.date).format("YYYY-MM-DD"));
-		}
-		setNote(workLog?.note ?? "");
-		setHoursWorked(workLog?.hoursWorked ?? 1);
-	}, [workLog]);
+		setName(user?.name ?? "");
+		setEmail(user?.email ?? "");
+		setRole(user?.role ?? "user");
+	}, [user]);
 	const http = useHttpClient();
 
-	const saveWorkLog = (e: MouseEvent<HTMLButtonElement>) => {
+	const saveUser = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		setSituation(Situation.Saving);
 		setErrors([]);
@@ -40,14 +35,10 @@ export const WorkLog: DialogComponent<{ workLog: any }> = ({
 		(async () => {
 			try {
 				const result = await http.request({
-					method: workLog ? "PATCH" : "POST",
-					uri: `work-log${workLog ? `/${workLog.id}` : ""}`,
+					method: user ? "PATCH" : "POST",
+					uri: `users${user ? `/${user.id}` : ""}`,
 					withAuth: true,
-					body: {
-						date: moment(date, "YYYY-MM-DD").toISOString(),
-						hoursWorked,
-						note,
-					},
+					body: { name, email, role },
 				});
 				if (result.error) {
 					setSituation(Situation.Ready);
@@ -55,14 +46,14 @@ export const WorkLog: DialogComponent<{ workLog: any }> = ({
 					setErrors(
 						Array.isArray(result.message)
 							? result.message
-							: ["Something went wrong saving your work log."]
+							: ["Something went wrong saving this user."]
 					);
 				} else {
 					setSituation(Situation.Saved);
 				}
 			} catch (error) {
 				setSituation(Situation.Ready);
-				setErrors(["Something went wrong saving your work log."]);
+				setErrors(["Something went wrong saving this user."]);
 			}
 		})();
 	};
@@ -72,7 +63,7 @@ export const WorkLog: DialogComponent<{ workLog: any }> = ({
 			{situation === Situation.Saved && (
 				<>
 					<p className="paragraph">
-						The work log has been {workLog ? "updated" : "saved"}.
+						The user has been {user ? "updated" : "saved"}.
 					</p>
 					<img
 						src={SuccessImage}
@@ -88,56 +79,52 @@ export const WorkLog: DialogComponent<{ workLog: any }> = ({
 			{[Situation.Ready, Situation.Saving].includes(situation) && (
 				<form className="form">
 					<label className="form__label">
-						Note
+						Name
 						<input
-							value={note}
+							value={name}
 							onChange={(e) => {
-								setNote(e.target.value);
+								setName(e.target.value);
 							}}
 							className="form__input"
 							type="text"
 						/>
 					</label>
 					<label className="form__label">
-						Hours spent
+						Role
 						<select
 							className="form__input"
-							style={{ width: "10ch" }}
 							onChange={(e) => {
-								if (e.target.value) {
-									setHoursWorked(parseInt(e.target.value));
-								}
+								setRole(e.target.value as Role);
 							}}
-							value={hoursWorked}
+							value={role}
 						>
-							{[...Array(24).keys()].map((hour) => (
-								<option key={hour + 1} value={hour + 1}>
-									{hour + 1}
+							{Object.entries(roles).map(([roleValue, roleDisplay]) => (
+								<option key={roleValue} value={roleValue}>
+									{roleDisplay}
 								</option>
 							))}
 						</select>
 					</label>
+
 					<label className="form__label">
-						Date worked
+						Email
 						<input
-							className="form__input"
-							type="date"
-							value={date}
-							style={{ width: "20ch" }}
+							value={email}
 							onChange={(e) => {
-								console.log(e.target.value);
-								setDate(e.target.value);
+								setEmail(e.target.value);
 							}}
+							className="form__input"
+							type="text"
 						/>
 					</label>
 					<button
 						className="button button__primary"
 						type="submit"
-						onClick={saveWorkLog}
+						onClick={saveUser}
 						disabled={situation === Situation.Saving}
 					>
-						<Icon withMargin="left">work</Icon>
-						{workLog ? "Save changes" : "Add work log"}
+						<Icon withMargin="left">person</Icon>
+						{user ? "Save changes" : "Create user"}
 					</button>
 					<Errors errors={errors} />
 				</form>
