@@ -58,9 +58,7 @@ export const UserManager = () => {
 	return (
 		<>
 			<div className="page">
-				<Link to="/dashboard">
-					Dashboard /
-				</Link>
+				<Link to="/dashboard">Dashboard /</Link>
 				<h2 className="page__title">User manager</h2>
 				{userDetails?.role !== "user" && (
 					<button
@@ -146,10 +144,7 @@ export const UserManager = () => {
 				onClose={closeModal}
 				title={selectedUser ? "Edit user" : "Create user"}
 			>
-				<User
-					closeDialog={closeModal}
-					user={selectedUser}
-				/>
+				<User closeDialog={closeModal} user={selectedUser} />
 			</Modal>
 		</>
 	);
