@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useHttpClient } from "../hooks/use-http-client";
 import { Icon } from "../components/Icon";
 import { Errors } from "../components/Errors";
-import MagicLinkImage from "../assets/illustrations/new_message_monochromatic.svg";
+import MagicLinkImage from "../assets/illustrations/new_message__monochromatic.svg";
 
 enum Situation {
 	initial,

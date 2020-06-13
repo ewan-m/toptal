@@ -12,13 +12,13 @@
     "format": "prettier \"src/**\" --write"
   },
   "dependencies": {
+    "focus-trap-react": "^6.0.0",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.26.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
-    "recoil": "^0.0.8",
-    "focus-trap-react": "^6.0.0"
+    "recoil": "^0.0.8"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

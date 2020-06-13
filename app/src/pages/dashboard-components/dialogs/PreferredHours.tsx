@@ -1,12 +1,13 @@
 import * as React from "react";
 import { MouseEvent, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import SuccessImage from "../../../assets/illustrations/fast_working_monochromatic.svg";
+import SuccessImage from "../../../assets/illustrations/fast_working__monochromatic.svg";
 import { Errors } from "../../../components/Errors";
 import { Icon } from "../../../components/Icon";
 import { LoadingSpinner } from "../../../components/LoadingSpinner";
 import { useHttpClient } from "../../../hooks/use-http-client";
-import { selectToken, selectUserDetails } from "../../../store/auth.state";
+import { selectUserDetails } from "../../../store/auth.state";
+import { DialogComponent } from "./dialog-component.interface";
 
 enum State {
 	Unset,
@@ -16,7 +17,7 @@ enum State {
 	Saved,
 }
 
-export const PreferredHours = () => {
+export const PreferredHours: DialogComponent = ({ closeDialog }) => {
 	const [situation, setSituation] = useState(State.Loading);
 	const [hours, setHours] = useState(1);
 	const [errors, setErrors] = useState([] as string[]);
@@ -87,14 +88,15 @@ export const PreferredHours = () => {
 				<>
 					<p className="paragraph">
 						Your preferred schedule of {hours} working hours per day has been saved.
-						You can now close this dialog using the close button or by pressing
-						outside it.
 					</p>
 					<img
 						src={SuccessImage}
 						className="modal__image"
 						alt="A drawing of someone riding a rocket"
 					/>
+					<button onClick={() => closeDialog()} className="button button__primary">
+						Ok, close dialog
+					</button>
 				</>
 			)}
 

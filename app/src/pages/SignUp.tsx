@@ -2,7 +2,7 @@ import * as React from "react";
 import { MouseEvent, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import SignUpImage from "../assets/illustrations/receptionist_monochromatic.svg";
+import SignUpImage from "../assets/illustrations/receptionist__monochromatic.svg";
 import { Errors } from "../components/Errors";
 import { Icon } from "../components/Icon";
 import { Role, roles } from "../constants/roles.type";

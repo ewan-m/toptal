@@ -2,7 +2,7 @@ import * as React from "react";
 import { MouseEvent, useEffect, useState } from "react";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import SignInImage from "../assets/illustrations/authentication_monochromatic.svg";
+import SignInImage from "../assets/illustrations/authentication__monochromatic.svg";
 import { Errors } from "../components/Errors";
 import { Icon } from "../components/Icon";
 import { useHttpClient } from "../hooks/use-http-client";

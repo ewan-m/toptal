@@ -29,7 +29,7 @@ const getQueryParams = (object: any) => {
 		}
 	});
 
-	return `?${params.join("&")}`;
+	return `${params.join("&")}`;
 };
 
 export const Dashboard = () => {
@@ -45,13 +45,9 @@ export const Dashboard = () => {
 		setWorkLogs([]);
 		setSituation(Situation.loading);
 		try {
-			let uri = "work-log";
-			if (dateFilter?.from || dateFilter?.to) {
-				uri += getQueryParams(dateFilter);
-			}
 			const result = await http.request({
 				method: "GET",
-				uri: uri,
+				uri: `work-log?${getQueryParams(dateFilter)}`,
 				withAuth: true,
 			});
 			if (Array.isArray(result)) {
@@ -168,14 +164,14 @@ export const Dashboard = () => {
 				onClose={closeModal}
 				title={selectedWorkLog ? "Edit work log" : "Add a work log"}
 			>
-				<WorkLog workLog={selectedWorkLog} />
+				<WorkLog closeDialog={closeModal} workLog={selectedWorkLog} />
 			</Modal>
 			<Modal
 				isVisible={visibleModal === "hours"}
 				onClose={closeModal}
 				title="Choose your preferred hours"
 			>
-				<PreferredHours />
+				<PreferredHours closeDialog={closeModal} />
 			</Modal>
 			<Modal
 				isVisible={visibleModal === "delete"}
@@ -183,6 +179,7 @@ export const Dashboard = () => {
 				title="Delete work log"
 			>
 				<DeleteResource
+					closeDialog={closeModal}
 					uri={`work-log/${selectedWorkLog?.id}`}
 					resourceName="work log"
 				/>
@@ -192,7 +189,7 @@ export const Dashboard = () => {
 				onClose={closeModal}
 				title="Filter work logs"
 			>
-				<DateFilter />
+				<DateFilter closeDialog={closeModal} />
 			</Modal>
 		</>
 	);

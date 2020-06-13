@@ -4,8 +4,9 @@ import { useRecoilState } from "recoil";
 import { Icon } from "../../../components/Icon";
 import { dateFilterAtom } from "../../../store/work-log-filter.state";
 import "./DateFilter.scss";
+import { DialogComponent } from "./dialog-component.interface";
 
-export const DateFilter = () => {
+export const DateFilter: DialogComponent = ({ closeDialog }) => {
 	const [filter, setFilter] = useRecoilState(dateFilterAtom);
 	const [from, setFrom] = useState("");
 	const [to, setTo] = useState("");
@@ -17,8 +18,8 @@ export const DateFilter = () => {
 
 	const saveFilter = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-
 		setFilter({ from, to });
+		closeDialog();
 	};
 	const removeFilter = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();

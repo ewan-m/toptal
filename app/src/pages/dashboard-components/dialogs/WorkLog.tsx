@@ -1,10 +1,11 @@
 import moment from "moment";
 import * as React from "react";
 import { FunctionComponent, MouseEvent, useState, useEffect } from "react";
-import SuccessImage from "../../../assets/illustrations/focused_working_monochromatic.svg";
+import SuccessImage from "../../../assets/illustrations/focused_working__monochromatic.svg";
 import { Errors } from "../../../components/Errors";
 import { Icon } from "../../../components/Icon";
 import { useHttpClient } from "../../../hooks/use-http-client";
+import { DialogComponent } from "./dialog-component.interface";
 
 enum Situation {
 	Ready,
@@ -12,7 +13,10 @@ enum Situation {
 	Saved,
 }
 
-export const WorkLog: FunctionComponent<{ workLog: any }> = ({ workLog }) => {
+export const WorkLog: DialogComponent<{ workLog: any }> = ({
+	workLog,
+	closeDialog,
+}) => {
 	const [date, setDate] = useState(moment().format("YYYY-MM-DD"));
 	const [note, setNote] = useState("");
 	const [hoursWorked, setHoursWorked] = useState(1);
@@ -68,14 +72,16 @@ export const WorkLog: FunctionComponent<{ workLog: any }> = ({ workLog }) => {
 			{situation === Situation.Saved && (
 				<>
 					<p className="paragraph">
-						The work log has been {workLog ? "updated" : "saved"}. You can now close
-						this dialog using the close button or by pressing outside it.
+						The work log has been {workLog ? "updated" : "saved"}.
 					</p>
 					<img
 						src={SuccessImage}
 						className="modal__image"
 						alt="A drawing of someone working on their laptop"
 					/>
+					<button onClick={() => closeDialog()} className="button button__primary">
+						Ok, close dialog
+					</button>
 				</>
 			)}
 
