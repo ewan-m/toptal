@@ -1,10 +1,10 @@
 import moment from "moment";
 import * as React from "react";
-import { FunctionComponent, MouseEvent, useState, useEffect } from "react";
-import SuccessImage from "../../../assets/illustrations/focused_working__monochromatic.svg";
-import { Errors } from "../../../components/Errors";
-import { Icon } from "../../../components/Icon";
-import { useHttpClient } from "../../../hooks/use-http-client";
+import { MouseEvent, useEffect, useState } from "react";
+import SuccessImage from "../../assets/illustrations/focused_working__monochromatic.svg";
+import { Errors } from "../../components/Errors";
+import { Icon } from "../../components/Icon";
+import { useHttpClient } from "../../hooks/use-http-client";
 import { DialogComponent } from "./dialog-component.interface";
 
 enum Situation {

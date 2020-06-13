@@ -1,8 +1,8 @@
 import * as React from "react";
 import { MouseEvent, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { Icon } from "../../../components/Icon";
-import { dateFilterAtom } from "../../../store/work-log-filter.state";
+import { Icon } from "../../components/Icon";
+import { dateFilterAtom } from "../../store/work-log-filter.state";
 import "./DateFilter.scss";
 import { DialogComponent } from "./dialog-component.interface";
 

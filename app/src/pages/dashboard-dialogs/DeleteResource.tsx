@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
-import DeleteImage from "../../../assets/illustrations/recycling__monochromatic.svg";
-import { Errors } from "../../../components/Errors";
-import { Icon } from "../../../components/Icon";
-import { useHttpClient } from "../../../hooks/use-http-client";
+import DeleteImage from "../../assets/illustrations/recycling__monochromatic.svg";
+import { Errors } from "../../components/Errors";
+import { Icon } from "../../components/Icon";
+import { useHttpClient } from "../../hooks/use-http-client";
 import { DialogComponent } from "./dialog-component.interface";
 
 enum Situation {

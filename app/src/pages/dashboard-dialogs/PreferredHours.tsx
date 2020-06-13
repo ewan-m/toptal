@@ -1,12 +1,12 @@
 import * as React from "react";
 import { MouseEvent, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import SuccessImage from "../../../assets/illustrations/fast_working__monochromatic.svg";
-import { Errors } from "../../../components/Errors";
-import { Icon } from "../../../components/Icon";
-import { LoadingSpinner } from "../../../components/LoadingSpinner";
-import { useHttpClient } from "../../../hooks/use-http-client";
-import { selectUserDetails } from "../../../store/auth.state";
+import SuccessImage from "../../assets/illustrations/fast_working__monochromatic.svg";
+import { Errors } from "../../components/Errors";
+import { Icon } from "../../components/Icon";
+import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { useHttpClient } from "../../hooks/use-http-client";
+import { selectUserDetails } from "../../store/auth.state";
 import { DialogComponent } from "./dialog-component.interface";
 
 enum State {
