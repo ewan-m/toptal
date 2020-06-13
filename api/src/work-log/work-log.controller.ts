@@ -20,8 +20,9 @@ import { TokenPayload } from "../auth/token-payload.type";
 import { User } from "../auth/user.entity";
 import { HasValidTokenGuard } from "../guards/has-valid-token.guard";
 import { IsNotUserManagerGuard } from "../guards/is-not-user-manager.guard";
+import { CreateWorkLogDto } from "./create-work-log.dto";
 import { DateFilterDto, getDateQuery } from "./date-filter.dto";
-import { WorkLogDto } from "./work-log.dto";
+import { UpdateWorkLogDto } from "./update-work-log.dto";
 import { WorkLog } from "./work-log.entity";
 
 @Controller()
@@ -75,7 +76,7 @@ export class WorkLogController {
 	@UseGuards(HasValidTokenGuard, IsNotUserManagerGuard)
 	async createWorkLog(
 		@Headers("authorization") authHeader: string,
-		@Body() workLogDto: WorkLogDto
+		@Body() workLogDto: CreateWorkLogDto
 	) {
 		const token = this.parseToken(authHeader);
 		const userId = token.id;
@@ -94,7 +95,7 @@ export class WorkLogController {
 	async updateWorkLog(
 		@Headers("authorization") authHeader: string,
 		@Param() { recordId },
-		@Body() workLogDto: WorkLogDto
+		@Body() workLogDto: UpdateWorkLogDto
 	) {
 		const matchingRecord = await this.workLogRepository.findOne({ id: recordId });
 
@@ -107,9 +108,12 @@ export class WorkLogController {
 		if (token.role === "user" && matchingRecord.user.id !== userId) {
 			throw new ForbiddenException(["Insufficient permissions to update record."]);
 		}
-		matchingRecord.note = workLogDto.note;
-		matchingRecord.hoursWorked = workLogDto.hoursWorked;
-		matchingRecord.date = workLogDto.date;
+
+		Object.keys(workLogDto).forEach((key) => {
+			if (workLogDto[key]) {
+				matchingRecord[key] = workLogDto[key];
+			}
+		});
 
 		return this.workLogRepository.save(matchingRecord);
 	}

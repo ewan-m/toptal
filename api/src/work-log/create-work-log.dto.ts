@@ -1,22 +1,24 @@
 import {
-	IsInt,
 	IsDateString,
-	IsString,
+	IsInt,
 	IsNotEmpty,
-	Min,
+	IsString,
 	Max,
+	Min,
 } from "class-validator";
 
-export class WorkLogDto {
+export class CreateWorkLogDto {
+	@IsNotEmpty()
 	@IsDateString()
 	date: string;
 
+	@IsNotEmpty()
 	@IsInt()
 	@Min(0)
 	@Max(24)
 	hoursWorked: number;
 
-	@IsString()
 	@IsNotEmpty()
+	@IsString()
 	note: string;
 }
