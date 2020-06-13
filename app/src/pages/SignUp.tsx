@@ -5,7 +5,7 @@ import { useRecoilState } from "recoil";
 import SignUpImage from "../assets/illustrations/receptionist__monochromatic.svg";
 import { Errors } from "../components/Errors";
 import { Icon } from "../components/Icon";
-import { Role, roles } from "../constants/roles.type";
+import { Role, roles } from "../types/roles.type";
 import { useHttpClient } from "../hooks/use-http-client";
 import { tokenAtom } from "../store/auth.state";
 

@@ -1,6 +1,6 @@
 import { decode } from "jsonwebtoken";
 import { atom, selector } from "recoil";
-import { TokenPayload } from "../constants/token-payload.type";
+import { TokenPayload } from "../types/token-payload.type";
 
 export const TOKEN_SYNC_KEY = "token";
 
