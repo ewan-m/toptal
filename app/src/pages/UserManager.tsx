@@ -86,6 +86,11 @@ export const UserManager = () => {
 					</button>
 				</div>
 				{situation === Situation.loading && <LoadingSpinner />}
+				{situation === Situation.error && (
+					<p className="paragraph paragraph--error card">
+						<Icon withMargin="left">error</Icon> Something went wrong loading users. Please try again later.
+					</p>
+				)}
 				{situation === Situation.loaded && (
 					<>
 						{users.length === 0 && (

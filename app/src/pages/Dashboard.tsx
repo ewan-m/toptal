@@ -120,6 +120,12 @@ export const Dashboard = () => {
 					)}
 				</div>
 				{situation === Situation.loading && <LoadingSpinner />}
+				{situation === Situation.error && (
+					<p className="paragraph paragraph--error card">
+						<Icon withMargin="left">error</Icon> Something went wrong loading work
+						logs. Please try again later.
+					</p>
+				)}
 				{situation === Situation.loaded && (
 					<>
 						{workLogs.length === 0 && (
