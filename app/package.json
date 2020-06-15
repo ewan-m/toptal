@@ -9,7 +9,12 @@
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html  --out-dir docs --public-url ./",
-    "format": "prettier \"src/**\" --write"
+    "format": "prettier \"src/**\" --write",
+    "cypress:open": "cypress install && cypress open",
+    "cypress:run": "cypress install && cypress run",
+    "e2e": "concurrently --kill-others --success first 'npm:cypress:run' 'npm:start'",
+    "e2e:watch": "concurrently --kill-others 'npm:cypress:open' 'npm:start'",
+    "e2e:clean-up": "node .\\cypress\\clean-up-database.js"
   },
   "dependencies": {
     "focus-trap-react": "^6.0.0",
@@ -30,6 +35,9 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.5",
     "@types/recoil": "^0.0.0",
+    "concurrently": "^5.2.0",
+    "cypress": "^4.8.0",
+    "mssql": "^6.2.0",
     "parcel-bundler": "^1.12.4",
     "prettier": "^2.0.5",
     "sass": "^1.26.8",
