@@ -8,6 +8,7 @@ import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useHttpClient } from "../../hooks/use-http-client";
 import { selectUserDetails } from "../../store/auth.state";
 import { DialogComponent } from "./dialog-component.interface";
+import { TokenPayload } from "../../types/token-payload.type";
 
 enum State {
 	Unset,
@@ -22,7 +23,7 @@ export const PreferredHours: DialogComponent = ({ closeDialog }) => {
 	const [hours, setHours] = useState(1);
 	const [errors, setErrors] = useState([] as string[]);
 	const http = useHttpClient();
-	const userDetails = useRecoilValue(selectUserDetails);
+	const userDetails = useRecoilValue(selectUserDetails) as TokenPayload;
 
 	useEffect(() => {
 		(async () => {
@@ -34,7 +35,7 @@ export const PreferredHours: DialogComponent = ({ closeDialog }) => {
 				});
 				if (result.preferredHours) {
 					setSituation(State.Set);
-					setHours(result.preferredHours);
+					setHours(result.preferredHours[userDetails.id]);
 				} else {
 					setSituation(State.Unset);
 				}

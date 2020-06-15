@@ -5,16 +5,28 @@
 	box-shadow: $shadow5px;
 	border-radius: $size0;
 	margin: $size3 0;
-	padding: $size0 $size2;
-
+	border-collapse: collapse;
 	text-align: left;
+	overflow: hidden;
 
 	th,
 	td {
-		padding: $size-3;
+		padding: $size0 $size2;
 	}
 
 	&__cell--fixedWidth {
 		width: 80px;
+	}
+
+	&__successRow {
+		background-color: $paleGreen;
+	}
+
+	&__failureRow {
+		background-color: $paleRed;
+	}
+
+	&__unknownRow {
+		background-color: $lightGrey;
 	}
 }

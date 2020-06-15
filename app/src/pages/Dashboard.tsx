@@ -39,6 +39,10 @@ export const Dashboard = () => {
 	const [situation, setSituation] = useState(Situation.loading);
 	const [visibleModal, setVisibleModal] = useState("none" as ModalWindows);
 	const [workLogs, setWorkLogs] = useState([] as WorkLog[]);
+	const [showTargetMetStyling, setShowTargetMetStyling] = useState(false);
+	const [preferredHours, setPreferredHours] = useState(
+		{} as { [userId: number]: number }
+	);
 	const [selectedWorkLog, setSelectedWorkLog] = useState(null as WorkLog | null);
 	const http = useHttpClient();
 	const userDetails = useRecoilValue(selectUserDetails);
@@ -50,6 +54,26 @@ export const Dashboard = () => {
 			history.push("/user");
 		}
 	}, [userDetails?.role]);
+
+	useEffect(() => {
+		fetchPreferences();
+		fetchLogs();
+	}, []);
+
+	const fetchPreferences = async () => {
+		try {
+			const result = await http.request({
+				method: "GET",
+				uri: `user-preferences${
+					userDetails?.role === "user" ? `/${userDetails?.id}` : ""
+				} `,
+				withAuth: true,
+			});
+			if (result.preferredHours) {
+				setPreferredHours(result.preferredHours);
+			}
+		} catch (error) {}
+	};
 
 	const fetchLogs = async () => {
 		setWorkLogs([]);
@@ -70,13 +94,33 @@ export const Dashboard = () => {
 			setSituation(Situation.error);
 		}
 	};
-	useEffect(() => {
-		fetchLogs();
-	}, []);
 
 	const closeModal = () => {
 		fetchLogs();
+		fetchPreferences();
 		setVisibleModal("none");
+	};
+
+	const getTargetMetStatus = (
+		date: string,
+		userId: number
+	): "success" | "failure" | "unknown" => {
+		if (!preferredHours[userId]) {
+			return "unknown";
+		}
+
+		const workLogsForUserOnDate = workLogs.filter(
+			(workLog) => workLog.date === date && workLog.user.id === userId
+		);
+
+		const cumulativeHoursOnDateForUser = workLogsForUserOnDate.reduce(
+			(accumulator, current) => accumulator + current.hoursWorked,
+			0
+		);
+
+		return cumulativeHoursOnDateForUser >= preferredHours[userId]
+			? "success"
+			: "failure";
 	};
 
 	return (
@@ -118,6 +162,23 @@ export const Dashboard = () => {
 							<Icon withMargin="left">cloud_download</Icon>Export
 						</a>
 					)}
+
+					<button
+						className="button button__secondary"
+						onClick={() => {
+							setShowTargetMetStyling(!showTargetMetStyling);
+						}}
+					>
+						{showTargetMetStyling ? (
+							<>
+								<Icon withMargin="left">visibility_off</Icon>Hide targets
+							</>
+						) : (
+							<>
+								<Icon withMargin="left">visibility</Icon>Show targets
+							</>
+						)}
+					</button>
 				</div>
 				{situation === Situation.loading && <LoadingSpinner />}
 				{situation === Situation.error && (
@@ -132,50 +193,66 @@ export const Dashboard = () => {
 							<p className="paragraph card">No work logs to show.</p>
 						)}
 						{workLogs.length >= 1 && (
-							<table className="table">
-								<thead>
-									<tr>
-										{userDetails?.role === "admin" && <th>User</th>}
-										<th>Note</th>
-										<th>Date</th>
-										<th>Hours worked</th>
-										<th className="table__cell--fixedWidth"></th>
-										<th className="table__cell--fixedWidth"></th>
-									</tr>
-								</thead>
-								<tbody>
-									{workLogs.map((log) => (
-										<tr key={log.id}>
-											{userDetails?.role === "admin" && <td>{log.user.name}</td>}
-											<td>{log.note}</td>
-											<td>{moment(log.date).format("LL")}</td>
-											<td>{log.hoursWorked}</td>
-											<td className="table__cell--fixedWidth">
-												<button
-													onClick={() => {
-														setSelectedWorkLog(log);
-														setVisibleModal("work");
-													}}
-													className="button button__secondary"
-												>
-													<Icon withMargin="left">edit</Icon>Edit
-												</button>
-											</td>
-											<td className="table__cell--fixedWidth">
-												<button
-													className="button button__destructive"
-													onClick={() => {
-														setSelectedWorkLog(log);
-														setVisibleModal("delete");
-													}}
-												>
-													<Icon withMargin="left">delete</Icon>Delete
-												</button>
-											</td>
+							<>
+								{showTargetMetStyling && (
+									<p className="paragraph paragraph--informational">
+										The green highlighting indicates days where users met their target
+										number of hours. The red indicates days they missed and grey means the
+										user hasn't supplied a target number of hours.
+									</p>
+								)}
+								<table className="table">
+									<thead>
+										<tr>
+											{userDetails?.role === "admin" && <th>User</th>}
+											<th>Note</th>
+											<th>Date</th>
+											<th>Hours worked</th>
+											<th className="table__cell--fixedWidth"></th>
+											<th className="table__cell--fixedWidth"></th>
 										</tr>
-									))}
-								</tbody>
-							</table>
+									</thead>
+									<tbody>
+										{workLogs.map((log) => (
+											<tr
+												key={log.id}
+												className={
+													showTargetMetStyling
+														? `table__${getTargetMetStatus(log.date, log.user.id)}Row`
+														: ""
+												}
+											>
+												{userDetails?.role === "admin" && <td>{log.user.name}</td>}
+												<td>{log.note}</td>
+												<td>{moment(log.date).format("LL")}</td>
+												<td>{log.hoursWorked}</td>
+												<td className="table__cell--fixedWidth">
+													<button
+														onClick={() => {
+															setSelectedWorkLog(log);
+															setVisibleModal("work");
+														}}
+														className="button button__secondary"
+													>
+														<Icon withMargin="left">edit</Icon>Edit
+													</button>
+												</td>
+												<td className="table__cell--fixedWidth">
+													<button
+														className="button button__destructive"
+														onClick={() => {
+															setSelectedWorkLog(log);
+															setVisibleModal("delete");
+														}}
+													>
+														<Icon withMargin="left">delete</Icon>Delete
+													</button>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</>
 						)}
 					</>
 				)}
