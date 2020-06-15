@@ -64,6 +64,7 @@ export class UsersController {
 				user[key] = updateUserDto[key];
 			}
 		});
+		user.isDeleted = false;
 
 		return this.userRepository.save(user);
 	}
@@ -78,7 +79,8 @@ export class UsersController {
 		}
 
 		user.isDeleted = true;
-		user.name = "[deleted]";
+		user.name = `${user.name} - [deleted]`;
+		user.email = "";
 		return this.userRepository.save(user);
 	}
 }

@@ -1,6 +1,7 @@
 import moment from "moment";
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { Icon } from "../components/Icon";
 import { LoadingSpinner } from "../components/LoadingSpinner";
@@ -8,12 +9,12 @@ import { Modal } from "../components/Modal";
 import { useHttpClient } from "../hooks/use-http-client";
 import { selectUserDetails } from "../store/auth.state";
 import { selectDateFilter } from "../store/work-log-filter.state";
+import { WorkLog } from "../types/work-log.type";
 import { DateFilter } from "./dialogs/DateFilter";
 import { DeleteResource } from "./dialogs/DeleteResource";
 import { PreferredHours } from "./dialogs/PreferredHours";
 import { UpsertWorkLog } from "./dialogs/UpsertWorkLog";
 import { getWorkLogsAsHtml } from "./helpers/get-work-logs-as-html";
-import { WorkLog } from "../types/work-log.type";
 
 type ModalWindows = "none" | "work" | "hours" | "delete" | "filter";
 
@@ -42,6 +43,13 @@ export const Dashboard = () => {
 	const http = useHttpClient();
 	const userDetails = useRecoilValue(selectUserDetails);
 	const dateFilter = useRecoilValue(selectDateFilter);
+	const history = useHistory();
+
+	useEffect(() => {
+		if (userDetails?.role === "userManager") {
+			history.push("/user");
+		}
+	}, [userDetails?.role]);
 
 	const fetchLogs = async () => {
 		setWorkLogs([]);
