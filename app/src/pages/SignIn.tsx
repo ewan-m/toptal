@@ -70,7 +70,7 @@ export const SignIn = () => {
 									setEmail(e.target.value);
 								}}
 								className="form__input"
-								type="text"
+								type="email"
 							/>
 						</label>
 						<label className="form__label">

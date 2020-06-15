@@ -11,6 +11,7 @@ import { Role, roles } from "../types/roles.type";
 import { User } from "../types/user.type";
 import { DeleteResource } from "./dialogs/DeleteResource";
 import { UpsertUser } from "./dialogs/UpsertUser";
+import { ResetPassword } from "./dialogs/ResetPassword";
 
 enum Situation {
 	loading,
@@ -18,7 +19,7 @@ enum Situation {
 	error,
 }
 
-type ModalWindows = "none" | "user" | "delete";
+type ModalWindows = "none" | "user" | "delete" | "resetPassword";
 
 export const UserManager = () => {
 	const [situation, setSituation] = useState(Situation.loading);
@@ -63,17 +64,27 @@ export const UserManager = () => {
 					<Link to="/dashboard">Dashboard /</Link>
 				)}
 				<h2 className="page__title">User manager</h2>
-				{userDetails?.role !== "user" && (
+				<div className="buttonRow">
+					{userDetails?.role !== "user" && (
+						<button
+							onClick={() => {
+								setSelectedUser(null);
+								setVisibleModal("user");
+							}}
+							className="button button__secondary"
+						>
+							<Icon withMargin="left">person</Icon>Add a user
+						</button>
+					)}
 					<button
 						onClick={() => {
-							setSelectedUser(null);
-							setVisibleModal("user");
+							setVisibleModal("resetPassword");
 						}}
 						className="button button__secondary"
 					>
-						<Icon withMargin="left">person</Icon>Add a user
+						<Icon withMargin="left">lock</Icon>Reset your password
 					</button>
-				)}
+				</div>
 				{situation === Situation.loading && <LoadingSpinner />}
 				{situation === Situation.loaded && (
 					<>
@@ -143,6 +154,13 @@ export const UserManager = () => {
 					uri={`users/${selectedUser?.id}`}
 					resourceName="user"
 				/>
+			</Modal>
+			<Modal
+				isVisible={visibleModal === "resetPassword"}
+				onClose={closeModal}
+				title="Reset your password"
+			>
+				<ResetPassword closeDialog={closeModal} />
 			</Modal>
 			<Modal
 				isVisible={visibleModal === "user"}

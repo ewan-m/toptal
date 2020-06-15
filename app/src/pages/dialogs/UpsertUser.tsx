@@ -119,7 +119,7 @@ export const UpsertUser: DialogComponent<{ user: User | null }> = ({
 								setEmail(e.target.value);
 							}}
 							className="form__input"
-							type="text"
+							type="email"
 						/>
 					</label>
 					<button

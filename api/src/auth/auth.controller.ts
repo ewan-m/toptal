@@ -107,7 +107,15 @@ export class AuthController {
 			try {
 				const userId = (decode(token) as TokenPayload).id;
 				const user = await this.userRepository.findOneOrFail(userId, {
-					select: ["passwordHash", "passwordSalt"],
+					select: [
+						"passwordHash",
+						"passwordSalt",
+						"email",
+						"id",
+						"isDeleted",
+						"name",
+						"role",
+					],
 				});
 				const passwordSalt = this.getSalt();
 				user.passwordSalt = passwordSalt;
