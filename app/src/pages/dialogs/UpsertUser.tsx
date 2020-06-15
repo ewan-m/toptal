@@ -32,35 +32,34 @@ export const UpsertUser: DialogComponent<{ user: User | null }> = ({
 	}, [user]);
 	const http = useHttpClient();
 
-	const saveUser = (e: MouseEvent<HTMLButtonElement>) => {
+	const saveUser = async (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		setSituation(Situation.Saving);
 		setErrors([]);
 
-		(async () => {
-			try {
-				const result = await http.request({
-					method: user ? "PATCH" : "POST",
-					uri: `users${user ? `/${user.id}` : ""}`,
-					withAuth: true,
-					body: getUpdatedFields(user as User, { name, email, role } as User),
-				});
-				if (result.error) {
-					setSituation(Situation.Ready);
-
-					setErrors(
-						Array.isArray(result.message)
-							? result.message
-							: ["Something went wrong saving this user."]
-					);
-				} else {
-					setSituation(Situation.Saved);
-				}
-			} catch (error) {
+		try {
+			const updated = { name, email, role } as User;
+			const result = await http.request({
+				method: user ? "PATCH" : "POST",
+				uri: `users${user ? `/${user.id}` : ""}`,
+				withAuth: true,
+				body: user ? getUpdatedFields(user, updated) : updated,
+			});
+			if (result.error) {
 				setSituation(Situation.Ready);
-				setErrors(["Something went wrong saving this user."]);
+
+				setErrors(
+					Array.isArray(result.message)
+						? result.message
+						: ["Something went wrong saving this user."]
+				);
+			} else {
+				setSituation(Situation.Saved);
 			}
-		})();
+		} catch (error) {
+			setSituation(Situation.Ready);
+			setErrors(["Something went wrong saving this user."]);
+		}
 	};
 
 	return (

@@ -34,42 +34,38 @@ export const UpsertWorkLog: DialogComponent<{ workLog: WorkLog | null }> = ({
 	}, [workLog]);
 	const http = useHttpClient();
 
-	const saveWorkLog = (e: MouseEvent<HTMLButtonElement>) => {
+	const saveWorkLog = async (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		setSituation(Situation.Saving);
 		setErrors([]);
 
-		(async () => {
-			try {
-				const result = await http.request({
-					method: workLog ? "PATCH" : "POST",
-					uri: `work-log${workLog ? `/${workLog.id}` : ""}`,
-					withAuth: true,
-					body: getUpdatedFields(
-						workLog as WorkLog,
-						{
-							date: moment(date, "YYYY-MM-DD").toISOString(),
-							hoursWorked,
-							note,
-						} as WorkLog
-					),
-				});
-				if (result.error) {
-					setSituation(Situation.Ready);
-
-					setErrors(
-						Array.isArray(result.message)
-							? result.message
-							: ["Something went wrong saving your work log."]
-					);
-				} else {
-					setSituation(Situation.Saved);
-				}
-			} catch (error) {
+		try {
+			const updated = {
+				date: moment(date, "YYYY-MM-DD").toISOString(),
+				hoursWorked,
+				note,
+			} as WorkLog;
+			const result = await http.request({
+				method: workLog ? "PATCH" : "POST",
+				uri: `work-log${workLog ? `/${workLog.id}` : ""}`,
+				withAuth: true,
+				body: workLog ? getUpdatedFields(workLog as WorkLog, updated) : updated,
+			});
+			if (result.error) {
 				setSituation(Situation.Ready);
-				setErrors(["Something went wrong saving your work log."]);
+
+				setErrors(
+					Array.isArray(result.message)
+						? result.message
+						: ["Something went wrong saving your work log."]
+				);
+			} else {
+				setSituation(Situation.Saved);
 			}
-		})();
+		} catch (error) {
+			setSituation(Situation.Ready);
+			setErrors(["Something went wrong saving your work log."]);
+		}
 	};
 
 	return (
