@@ -21,17 +21,13 @@
 	&__row {
 		transition: 0.2s ease-in-out background-color;
 		&--success {
-			
-		background-color: $paleGreen;
+			background-color: $paleGreen;
 		}
 		&--failure {
-			
-		background-color: $paleRed;
+			background-color: $paleRed;
 		}
 		&--unknown {
-			
-		background-color: $lightGrey;
+			background-color: $lightGrey;
 		}
 	}
-
 }
