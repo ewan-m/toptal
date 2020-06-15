@@ -4,6 +4,6 @@ export type User = {
 	role: Role;
 	name: string;
 	email: string;
-    id: number;
-    isDeleted: boolean;
+	id: number;
+	isDeleted: boolean;
 };

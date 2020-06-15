@@ -101,9 +101,15 @@ export const Dashboard = () => {
 					>
 						<Icon withMargin="left">schedule</Icon>Choose your preferred hours
 					</button>
-					<a href={getWorkLogsAsHtml(workLogs)} download="WorkLogs.html" className="button button__secondary">
-						<Icon withMargin="left">cloud_download</Icon>Export
-					</a>
+					{workLogs && workLogs?.length > 0 && (
+						<a
+							href={getWorkLogsAsHtml(workLogs)}
+							download="WorkLogs.html"
+							className="button button__secondary"
+						>
+							<Icon withMargin="left">cloud_download</Icon>Export
+						</a>
+					)}
 				</div>
 				{situation === Situation.loading && <LoadingSpinner />}
 				{situation === Situation.loaded && (
