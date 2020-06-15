@@ -10,6 +10,11 @@ import {
 	TOKEN_SYNC_KEY,
 } from "../store/auth.state";
 import {
+	userPreferencesStatus,
+	usersFetchStatus,
+	workLogsFetchStatus,
+} from "../store/http-request.state";
+import {
 	DATE_FILTER_SYNC_KEY,
 	selectDateFilter,
 } from "../store/work-log-filter.state";
@@ -19,12 +24,20 @@ import "./SiteContainer.scss";
 export const SiteContainer: FunctionComponent = ({ children }) => {
 	const history = useHistory();
 	const [token, setToken] = useRecoilState(tokenAtom);
+
+	const [_, setUsersFetchStatus] = useRecoilState(usersFetchStatus);
+	const [__, setLogsFetchStatus] = useRecoilState(workLogsFetchStatus);
+	const [___, setPreferencesFetchStatus] = useRecoilState(userPreferencesStatus);
+
 	const userDetails = useRecoilValue(selectUserDetails);
 	useStateSynchronizer(TOKEN_SYNC_KEY, selectToken);
 	useStateSynchronizer(DATE_FILTER_SYNC_KEY, selectDateFilter);
 
 	const signOut = () => {
 		setToken("");
+		setLogsFetchStatus("initial");
+		setPreferencesFetchStatus("initial");
+		setUsersFetchStatus("initial");
 		history.push("/");
 	};
 

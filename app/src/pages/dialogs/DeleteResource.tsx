@@ -5,6 +5,7 @@ import { Errors } from "../../components/Errors";
 import { Icon } from "../../components/Icon";
 import { useHttpClient } from "../../hooks/use-http-client";
 import { DialogComponent } from "./dialog-component.interface";
+import { FetchStatus } from "../../store/http-request.state";
 
 enum Situation {
 	Confirm,
@@ -15,9 +16,11 @@ enum Situation {
 export const DeleteResource: DialogComponent<{
 	uri: string;
 	resourceName: string;
-}> = ({ uri, resourceName, closeDialog }) => {
+	updateFetchStatus: (status: FetchStatus) => void;
+}> = ({ uri, resourceName, closeDialog, updateFetchStatus }) => {
 	const [situation, setSituation] = useState(Situation.Confirm);
 	const [errors, setErrors] = useState([] as string[]);
+
 	const http = useHttpClient();
 
 	const deleteResource = async () => {
@@ -34,6 +37,7 @@ export const DeleteResource: DialogComponent<{
 				);
 			} else {
 				setSituation(Situation.Deleted);
+				updateFetchStatus("stale");
 			}
 		} catch (error) {
 			setSituation(Situation.Confirm);

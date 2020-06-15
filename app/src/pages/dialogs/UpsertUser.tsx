@@ -8,6 +8,8 @@ import { Role, roles } from "../../types/roles.type";
 import { DialogComponent } from "./dialog-component.interface";
 import { User } from "../../types/user.type";
 import { getUpdatedFields } from "../helpers/get-updated-fields";
+import { useRecoilState } from "recoil";
+import { usersFetchStatus } from "../../store/http-request.state";
 
 enum Situation {
 	Ready,
@@ -24,6 +26,7 @@ export const UpsertUser: DialogComponent<{ user: User | null }> = ({
 	const [role, setRole] = useState("user" as Role);
 	const [errors, setErrors] = useState([] as string[]);
 	const [situation, setSituation] = useState(Situation.Ready);
+	const [_, setUserFetchStatus] = useRecoilState(usersFetchStatus);
 
 	useEffect(() => {
 		setName(user?.name ?? "");
@@ -55,6 +58,7 @@ export const UpsertUser: DialogComponent<{ user: User | null }> = ({
 				);
 			} else {
 				setSituation(Situation.Saved);
+				setUserFetchStatus("stale");
 			}
 		} catch (error) {
 			setSituation(Situation.Ready);

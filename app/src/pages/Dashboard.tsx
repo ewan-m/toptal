@@ -2,7 +2,7 @@ import moment from "moment";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { Icon } from "../components/Icon";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { Modal } from "../components/Modal";
@@ -15,14 +15,13 @@ import { DeleteResource } from "./dialogs/DeleteResource";
 import { PreferredHours } from "./dialogs/PreferredHours";
 import { UpsertWorkLog } from "./dialogs/UpsertWorkLog";
 import { getWorkLogsAsHtml } from "./helpers/get-work-logs-as-html";
+import {
+	workLogsFetchStatus,
+	userPreferencesStatus,
+} from "../store/http-request.state";
 
 type ModalWindows = "none" | "work" | "hours" | "delete" | "filter";
 
-enum Situation {
-	loading,
-	loaded,
-	error,
-}
 const getQueryParams = (object: any) => {
 	const params: string[] = [];
 
@@ -36,7 +35,6 @@ const getQueryParams = (object: any) => {
 };
 
 export const Dashboard = () => {
-	const [situation, setSituation] = useState(Situation.loading);
 	const [visibleModal, setVisibleModal] = useState("none" as ModalWindows);
 	const [workLogs, setWorkLogs] = useState([] as WorkLog[]);
 	const [showTargetMetStyling, setShowTargetMetStyling] = useState(false);
@@ -44,10 +42,22 @@ export const Dashboard = () => {
 		{} as { [userId: number]: number }
 	);
 	const [selectedWorkLog, setSelectedWorkLog] = useState(null as WorkLog | null);
+	const [logsFetchStatus, setLogsFetchStatus] = useRecoilState(
+		workLogsFetchStatus
+	);
+	const [preferencesFetchStatus, setPreferencesFetchStatus] = useRecoilState(
+		userPreferencesStatus
+	);
+
 	const http = useHttpClient();
 	const userDetails = useRecoilValue(selectUserDetails);
 	const dateFilter = useRecoilValue(selectDateFilter);
 	const history = useHistory();
+
+	useEffect(() => {
+		setLogsFetchStatus("initial");
+		setPreferencesFetchStatus("initial");
+	}, []);
 
 	useEffect(() => {
 		if (userDetails?.role === "userManager") {
@@ -57,47 +67,57 @@ export const Dashboard = () => {
 
 	useEffect(() => {
 		fetchPreferences();
+	}, [preferencesFetchStatus]);
+
+	useEffect(() => {
 		fetchLogs();
-	}, []);
+	}, [logsFetchStatus]);
 
 	const fetchPreferences = async () => {
-		try {
-			const result = await http.request({
-				method: "GET",
-				uri: `user-preferences${
-					userDetails?.role === "user" ? `/${userDetails?.id}` : ""
-				} `,
-				withAuth: true,
-			});
-			if (result.preferredHours) {
-				setPreferredHours(result.preferredHours);
+		if (!["loading", "loaded", "error"].includes(preferencesFetchStatus)) {
+			try {
+				setPreferencesFetchStatus("loading");
+				const result = await http.request({
+					method: "GET",
+					uri: `user-preferences${
+						userDetails?.role === "user" ? `/${userDetails?.id}` : ""
+					} `,
+					withAuth: true,
+				});
+				if (result.preferredHours) {
+					setPreferencesFetchStatus("loaded");
+					setPreferredHours(result.preferredHours);
+				} else {
+					setPreferencesFetchStatus("error");
+				}
+			} catch (error) {
+				setPreferencesFetchStatus("error");
 			}
-		} catch (error) {}
+		}
 	};
 
 	const fetchLogs = async () => {
-		setWorkLogs([]);
-		setSituation(Situation.loading);
-		try {
-			const result = await http.request({
-				method: "GET",
-				uri: `work-log?${getQueryParams(dateFilter)}`,
-				withAuth: true,
-			});
-			if (Array.isArray(result)) {
-				setWorkLogs(result);
-				setSituation(Situation.loaded);
-			} else {
-				setSituation(Situation.error);
+		if (!["loading", "loaded", "error"].includes(logsFetchStatus)) {
+			setLogsFetchStatus("loading");
+			setWorkLogs([]);
+			try {
+				const result = await http.request({
+					method: "GET",
+					uri: `work-log?${getQueryParams(dateFilter)}`,
+					withAuth: true,
+				});
+				if (Array.isArray(result)) {
+					setWorkLogs(result);
+					setLogsFetchStatus("loaded");
+				} else {
+				}
+			} catch (error) {
+				setLogsFetchStatus("error");
 			}
-		} catch (error) {
-			setSituation(Situation.error);
 		}
 	};
 
 	const closeModal = () => {
-		fetchLogs();
-		fetchPreferences();
 		setVisibleModal("none");
 	};
 
@@ -180,27 +200,20 @@ export const Dashboard = () => {
 						)}
 					</button>
 				</div>
-				{situation === Situation.loading && <LoadingSpinner />}
-				{situation === Situation.error && (
+				{logsFetchStatus === "loading" && <LoadingSpinner />}
+				{logsFetchStatus === "error" && (
 					<p className="paragraph paragraph--error card">
 						<Icon withMargin="left">error</Icon> Something went wrong loading work
 						logs. Please try again later.
 					</p>
 				)}
-				{situation === Situation.loaded && (
+				{logsFetchStatus === "loaded" && (
 					<>
 						{workLogs.length === 0 && (
 							<p className="paragraph card">No work logs to show.</p>
 						)}
 						{workLogs.length >= 1 && (
 							<>
-								{showTargetMetStyling && (
-									<p className="paragraph paragraph--informational">
-										The green highlighting indicates days where users met their target
-										number of hours. The red indicates days they missed and grey means the
-										user hasn't supplied a target number of hours.
-									</p>
-								)}
 								<table className="table">
 									<thead>
 										<tr>
@@ -216,11 +229,11 @@ export const Dashboard = () => {
 										{workLogs.map((log) => (
 											<tr
 												key={log.id}
-												className={
+												className={`table__row ${
 													showTargetMetStyling
-														? `table__${getTargetMetStatus(log.date, log.user.id)}Row`
+														? `table__row--${getTargetMetStatus(log.date, log.user.id)}`
 														: ""
-												}
+												}`}
 											>
 												{userDetails?.role === "admin" && <td>{log.user.name}</td>}
 												<td>{log.note}</td>
@@ -252,6 +265,13 @@ export const Dashboard = () => {
 										))}
 									</tbody>
 								</table>
+								{showTargetMetStyling && (
+									<p className="paragraph paragraph--informational">
+										The green highlighting indicates days where users met their target
+										number of hours. The red indicates days they missed and grey means the
+										user hasn't supplied a target number of hours.
+									</p>
+								)}
 							</>
 						)}
 					</>
@@ -279,6 +299,7 @@ export const Dashboard = () => {
 			>
 				<DeleteResource
 					closeDialog={closeModal}
+					updateFetchStatus={setLogsFetchStatus}
 					uri={`work-log/${selectedWorkLog?.id}`}
 					resourceName="work log"
 				/>

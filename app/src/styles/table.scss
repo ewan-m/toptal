@@ -18,15 +18,20 @@
 		width: 80px;
 	}
 
-	&__successRow {
+	&__row {
+		transition: 0.2s ease-in-out background-color;
+		&--success {
+			
 		background-color: $paleGreen;
-	}
-
-	&__failureRow {
+		}
+		&--failure {
+			
 		background-color: $paleRed;
+		}
+		&--unknown {
+			
+		background-color: $lightGrey;
+		}
 	}
 
-	&__unknownRow {
-		background-color: $lightGrey;
-	}
 }

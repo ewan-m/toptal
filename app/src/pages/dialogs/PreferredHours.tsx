@@ -1,6 +1,6 @@
 import * as React from "react";
 import { MouseEvent, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import SuccessImage from "../../assets/illustrations/fast_working__monochromatic.svg";
 import { Errors } from "../../components/Errors";
 import { Icon } from "../../components/Icon";
@@ -9,6 +9,7 @@ import { useHttpClient } from "../../hooks/use-http-client";
 import { selectUserDetails } from "../../store/auth.state";
 import { DialogComponent } from "./dialog-component.interface";
 import { TokenPayload } from "../../types/token-payload.type";
+import { userPreferencesStatus } from "../../store/http-request.state";
 
 enum State {
 	Unset,
@@ -22,6 +23,8 @@ export const PreferredHours: DialogComponent = ({ closeDialog }) => {
 	const [situation, setSituation] = useState(State.Loading);
 	const [hours, setHours] = useState(1);
 	const [errors, setErrors] = useState([] as string[]);
+	const [_, setPreferencesFetchStatus] = useRecoilState(userPreferencesStatus);
+
 	const http = useHttpClient();
 	const userDetails = useRecoilValue(selectUserDetails) as TokenPayload;
 
@@ -60,6 +63,7 @@ export const PreferredHours: DialogComponent = ({ closeDialog }) => {
 					body: { preferredHours: hours },
 				});
 				if (result.preferredHours) {
+					setPreferencesFetchStatus("stale");
 					setSituation(State.Saved);
 				} else {
 					if (result.error) {

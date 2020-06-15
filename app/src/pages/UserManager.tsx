@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { Icon } from "../components/Icon";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { Modal } from "../components/Modal";
@@ -12,48 +12,50 @@ import { User } from "../types/user.type";
 import { DeleteResource } from "./dialogs/DeleteResource";
 import { UpsertUser } from "./dialogs/UpsertUser";
 import { ResetPassword } from "./dialogs/ResetPassword";
-
-enum Situation {
-	loading,
-	loaded,
-	error,
-}
+import { usersFetchStatus } from "../store/http-request.state";
 
 type ModalWindows = "none" | "user" | "delete" | "resetPassword";
 
 export const UserManager = () => {
-	const [situation, setSituation] = useState(Situation.loading);
 	const [visibleModal, setVisibleModal] = useState("none" as ModalWindows);
 	const [selectedUser, setSelectedUser] = useState(null as User | null);
 	const [users, setUsers] = useState([] as User[]);
+	const [usersStatus, setUsersStatus] = useRecoilState(usersFetchStatus);
+
 	const http = useHttpClient();
 	const userDetails = useRecoilValue(selectUserDetails);
 
+	useEffect(() => {
+		setUsersStatus("initial");
+	}, []);
+
 	const fetchUsers = async () => {
-		setUsers([]);
-		setSituation(Situation.loading);
-		try {
-			const result = await http.request({
-				method: "GET",
-				uri: `users${userDetails?.role === "user" ? `/${userDetails.id}` : ""}`,
-				withAuth: true,
-			});
-			if (Array.isArray(result)) {
-				setUsers(result);
-				setSituation(Situation.loaded);
-			} else {
-				setSituation(Situation.error);
+		if (!["loading", "loaded", "error"].includes(usersStatus)) {
+			setUsersStatus("loading");
+			setUsers([]);
+			try {
+				const result = await http.request({
+					method: "GET",
+					uri: `users${userDetails?.role === "user" ? `/${userDetails.id}` : ""}`,
+					withAuth: true,
+				});
+				if (Array.isArray(result)) {
+					setUsers(result);
+					setUsersStatus("loaded");
+				} else {
+					setUsersStatus("error");
+				}
+			} catch (error) {
+				setUsersStatus("error");
 			}
-		} catch (error) {
-			setSituation(Situation.error);
 		}
 	};
 	useEffect(() => {
+		console.log(usersStatus);
 		fetchUsers();
-	}, []);
+	}, [usersStatus]);
 
 	const closeModal = () => {
-		fetchUsers();
 		setVisibleModal("none");
 	};
 
@@ -85,14 +87,14 @@ export const UserManager = () => {
 						<Icon withMargin="left">lock</Icon>Reset your password
 					</button>
 				</div>
-				{situation === Situation.loading && <LoadingSpinner />}
-				{situation === Situation.error && (
+				{usersStatus === "loading" && <LoadingSpinner />}
+				{usersStatus === "error" && (
 					<p className="paragraph paragraph--error card">
 						<Icon withMargin="left">error</Icon> Something went wrong loading users.
 						Please try again later.
 					</p>
 				)}
-				{situation === Situation.loaded && (
+				{usersStatus === "loaded" && (
 					<>
 						{users.length === 0 && (
 							<p className="paragraph card">No users to show.</p>
@@ -156,6 +158,7 @@ export const UserManager = () => {
 				title="Delete user"
 			>
 				<DeleteResource
+					updateFetchStatus={setUsersStatus}
 					closeDialog={closeModal}
 					uri={`users/${selectedUser?.id}`}
 					resourceName="user"

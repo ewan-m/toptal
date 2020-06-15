@@ -8,6 +8,8 @@ import { useHttpClient } from "../../hooks/use-http-client";
 import { DialogComponent } from "./dialog-component.interface";
 import { WorkLog } from "../../types/work-log.type";
 import { getUpdatedFields } from "../helpers/get-updated-fields";
+import { useRecoilState } from "recoil";
+import { workLogsFetchStatus } from "../../store/http-request.state";
 
 enum Situation {
 	Ready,
@@ -24,6 +26,7 @@ export const UpsertWorkLog: DialogComponent<{ workLog: WorkLog | null }> = ({
 	const [hoursWorked, setHoursWorked] = useState(1);
 	const [errors, setErrors] = useState([] as string[]);
 	const [situation, setSituation] = useState(Situation.Ready);
+	const [_, setWorkLogFetchStatus] = useRecoilState(workLogsFetchStatus);
 
 	useEffect(() => {
 		if (workLog?.date) {
@@ -60,6 +63,7 @@ export const UpsertWorkLog: DialogComponent<{ workLog: WorkLog | null }> = ({
 						: ["Something went wrong saving your work log."]
 				);
 			} else {
+				setWorkLogFetchStatus("stale");
 				setSituation(Situation.Saved);
 			}
 		} catch (error) {
