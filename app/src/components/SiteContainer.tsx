@@ -1,19 +1,25 @@
 import * as React from "react";
 import { FunctionComponent } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useStateSynchronizer } from "../hooks/use-state-synchronizer";
-import { selectToken, tokenAtom, TOKEN_SYNC_KEY } from "../store/auth.state";
-import { Icon } from "./Icon";
-import "./SiteContainer.scss";
+import {
+	selectToken,
+	selectUserDetails,
+	tokenAtom,
+	TOKEN_SYNC_KEY,
+} from "../store/auth.state";
 import {
 	DATE_FILTER_SYNC_KEY,
 	selectDateFilter,
 } from "../store/work-log-filter.state";
+import { Icon } from "./Icon";
+import "./SiteContainer.scss";
 
 export const SiteContainer: FunctionComponent = ({ children }) => {
 	const history = useHistory();
 	const [token, setToken] = useRecoilState(tokenAtom);
+	const userDetails = useRecoilValue(selectUserDetails);
 	useStateSynchronizer(TOKEN_SYNC_KEY, selectToken);
 	useStateSynchronizer(DATE_FILTER_SYNC_KEY, selectDateFilter);
 
@@ -34,9 +40,11 @@ export const SiteContainer: FunctionComponent = ({ children }) => {
 					</Link>
 					{!!token && (
 						<nav className="siteHeader__nav">
-							<Link className="siteHeader__a siteHeader__nav__link" to="/user">
-								User
-							</Link>
+							{userDetails?.role !== "userManager" && (
+								<Link className="siteHeader__a siteHeader__nav__link" to="/user">
+									User
+								</Link>
+							)}
 							<button onClick={signOut} className="button button__secondary">
 								<Icon withMargin="left">person</Icon>Sign out
 							</button>

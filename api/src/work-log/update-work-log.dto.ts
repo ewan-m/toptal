@@ -18,7 +18,7 @@ export class UpdateWorkLogDto {
 	@Max(24)
 	hoursWorked?: number;
 
-	@ValidateIf(w => w.note !== undefined)
+	@ValidateIf((w) => w.note !== undefined)
 	@IsString()
 	note?: string;
 }

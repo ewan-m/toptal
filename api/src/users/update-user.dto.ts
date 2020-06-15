@@ -4,18 +4,17 @@ import { IsRole } from "../auth/validators/is-role.validator";
 import { IsUniqueEmail } from "../auth/validators/is-unique-email.validator";
 
 export class UpdateUserDto {
-	@ValidateIf(u => u.name !== undefined)
+	@ValidateIf((u) => u.name !== undefined)
 	@IsString()
-
 	name?: string;
 
-	@ValidateIf(u => u.email !== undefined)
+	@ValidateIf((u) => u.email !== undefined)
 	@IsString()
 	@IsEmail()
 	@IsUniqueEmail()
 	email?: string;
 
-	@ValidateIf(u => u.role !== undefined)
+	@ValidateIf((u) => u.role !== undefined)
 	@IsString()
 	@IsRole()
 	role?: Role;

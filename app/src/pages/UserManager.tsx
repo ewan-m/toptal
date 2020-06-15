@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { Icon } from "../components/Icon";
 import { LoadingSpinner } from "../components/LoadingSpinner";
@@ -7,10 +8,9 @@ import { Modal } from "../components/Modal";
 import { useHttpClient } from "../hooks/use-http-client";
 import { selectUserDetails } from "../store/auth.state";
 import { Role, roles } from "../types/roles.type";
-import { DeleteResource } from "./dialogs/DeleteResource";
-import { Link } from "react-router-dom";
-import { UpsertUser } from "./dialogs/UpsertUser";
 import { User } from "../types/user.type";
+import { DeleteResource } from "./dialogs/DeleteResource";
+import { UpsertUser } from "./dialogs/UpsertUser";
 
 enum Situation {
 	loading,
@@ -59,7 +59,9 @@ export const UserManager = () => {
 	return (
 		<>
 			<div className="page">
-				<Link to="/dashboard">Dashboard /</Link>
+				{userDetails?.role !== "userManager" && (
+					<Link to="/dashboard">Dashboard /</Link>
+				)}
 				<h2 className="page__title">User manager</h2>
 				{userDetails?.role !== "user" && (
 					<button
