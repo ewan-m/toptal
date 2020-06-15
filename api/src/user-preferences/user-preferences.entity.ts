@@ -12,7 +12,7 @@ export class UserPreference {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne((type) => User, { nullable: false })
+	@OneToOne((type) => User, { nullable: false, eager: true })
 	@JoinColumn()
 	user: User;
 

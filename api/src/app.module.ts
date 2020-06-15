@@ -5,14 +5,15 @@ import { AuthController } from "./auth/auth.controller";
 import { User } from "./auth/user.entity";
 import { IsUniqueEmailConstraint } from "./auth/validators/is-unique-email.validator";
 import { HasValidTokenGuard } from "./guards/has-valid-token.guard";
+import { IsAdminGuard } from "./guards/is-admin.guard";
 import { IsNotUserManagerGuard } from "./guards/is-not-user-manager.guard";
 import { TokenIdMatchesRequestedIdGuard } from "./guards/token-id-matches-requested-id.guard";
 import config from "./orm-config";
 import { UserPreferencesController } from "./user-preferences/user-preferences.controller";
 import { UserPreference } from "./user-preferences/user-preferences.entity";
+import { UsersController } from "./users/users.controller";
 import { WorkLogController } from "./work-log/work-log.controller";
 import { WorkLog } from "./work-log/work-log.entity";
-import { UsersController } from "./users/users.controller";
 
 @Module({
 	imports: [
@@ -36,6 +37,7 @@ import { UsersController } from "./users/users.controller";
 		TokenIdMatchesRequestedIdGuard,
 		IsUniqueEmailConstraint,
 		IsNotUserManagerGuard,
+		IsAdminGuard,
 	],
 })
 export class AppModule {}

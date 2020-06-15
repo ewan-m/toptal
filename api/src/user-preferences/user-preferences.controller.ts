@@ -8,11 +8,12 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { HasValidTokenGuard } from "src/guards/has-valid-token.guard";
+import { HasValidTokenGuard } from "../guards/has-valid-token.guard";
 import { Repository } from "typeorm";
 import { TokenIdMatchesRequestedIdGuard } from "../guards/token-id-matches-requested-id.guard";
 import { UserPreferencesDto } from "./user-preferences.dto";
 import { UserPreference } from "./user-preferences.entity";
+import { IsAdminGuard } from "../guards/is-admin.guard";
 
 @Controller()
 export class UserPreferencesController {
@@ -21,6 +22,19 @@ export class UserPreferencesController {
 		private readonly userPreferenceRepository: Repository<UserPreference>
 	) {}
 
+	@Get("/user-preferences")
+	@UseGuards(HasValidTokenGuard, IsAdminGuard)
+	async getAllPreferredHours() {
+		const preferences = await this.userPreferenceRepository.find();
+
+		const preferredHours = {};
+		preferences.forEach((preference) => {
+			preferredHours[preference.user.id] = preference.preferredWorkingHourPerDay;
+		});
+
+		return { preferredHours };
+	}
+
 	@Get("/user-preferences/:userId")
 	@UseGuards(HasValidTokenGuard, TokenIdMatchesRequestedIdGuard)
 	async getPreferredHours(@Param() { userId }) {
@@ -28,7 +42,7 @@ export class UserPreferencesController {
 			const result = await this.userPreferenceRepository.findOneOrFail({
 				user: { id: userId },
 			});
-			return { preferredHours: result.preferredWorkingHourPerDay };
+			return { preferredHours: { [userId]: result.preferredWorkingHourPerDay } };
 		} catch (error) {
 			throw new NotFoundException(["The requested resource wasn't found."]);
 		}
@@ -52,6 +66,6 @@ export class UserPreferencesController {
 			userPreferencesDto.preferredHours;
 
 		await this.userPreferenceRepository.save(userPreferences);
-		return userPreferencesDto;
+		return { preferredHours: { [userId]: userPreferencesDto.preferredHours } };
 	}
 }
