@@ -7,6 +7,7 @@ import { Icon } from "../../components/Icon";
 import { useHttpClient } from "../../hooks/use-http-client";
 import { DialogComponent } from "./dialog-component.interface";
 import { WorkLog } from "../../types/work-log.type";
+import { getUpdatedFields } from "../helpers/get-updated-fields";
 
 enum Situation {
 	Ready,
@@ -44,11 +45,14 @@ export const UpsertWorkLog: DialogComponent<{ workLog: WorkLog | null }> = ({
 					method: workLog ? "PATCH" : "POST",
 					uri: `work-log${workLog ? `/${workLog.id}` : ""}`,
 					withAuth: true,
-					body: {
-						date: moment(date, "YYYY-MM-DD").toISOString(),
-						hoursWorked,
-						note,
-					},
+					body: getUpdatedFields(
+						workLog as WorkLog,
+						{
+							date: moment(date, "YYYY-MM-DD").toISOString(),
+							hoursWorked,
+							note,
+						} as WorkLog
+					),
 				});
 				if (result.error) {
 					setSituation(Situation.Ready);

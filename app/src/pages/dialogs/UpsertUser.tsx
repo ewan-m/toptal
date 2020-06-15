@@ -7,6 +7,7 @@ import { useHttpClient } from "../../hooks/use-http-client";
 import { Role, roles } from "../../types/roles.type";
 import { DialogComponent } from "./dialog-component.interface";
 import { User } from "../../types/user.type";
+import { getUpdatedFields } from "../helpers/get-updated-fields";
 
 enum Situation {
 	Ready,
@@ -42,7 +43,7 @@ export const UpsertUser: DialogComponent<{ user: User | null }> = ({
 					method: user ? "PATCH" : "POST",
 					uri: `users${user ? `/${user.id}` : ""}`,
 					withAuth: true,
-					body: { name, email, role },
+					body: getUpdatedFields(user as User, { name, email, role } as User),
 				});
 				if (result.error) {
 					setSituation(Situation.Ready);
