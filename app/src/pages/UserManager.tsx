@@ -9,7 +9,8 @@ import { selectUserDetails } from "../store/auth.state";
 import { Role, roles } from "../types/roles.type";
 import { DeleteResource } from "./dialogs/DeleteResource";
 import { Link } from "react-router-dom";
-import { User } from "./dialogs/User";
+import { UpsertUser } from "./dialogs/UpsertUser";
+import { User } from "../types/user.type";
 
 enum Situation {
 	loading,
@@ -22,8 +23,8 @@ type ModalWindows = "none" | "user" | "delete";
 export const UserManager = () => {
 	const [situation, setSituation] = useState(Situation.loading);
 	const [visibleModal, setVisibleModal] = useState("none" as ModalWindows);
-	const [selectedUser, setSelectedUser] = useState(null as any);
-	const [users, setUsers] = useState([] as any[]);
+	const [selectedUser, setSelectedUser] = useState(null as User | null);
+	const [users, setUsers] = useState([] as User[]);
 	const http = useHttpClient();
 	const userDetails = useRecoilValue(selectUserDetails);
 
@@ -144,7 +145,7 @@ export const UserManager = () => {
 				onClose={closeModal}
 				title={selectedUser ? "Edit user" : "Create user"}
 			>
-				<User closeDialog={closeModal} user={selectedUser} />
+				<UpsertUser closeDialog={closeModal} user={selectedUser} />
 			</Modal>
 		</>
 	);

@@ -6,6 +6,7 @@ import { Icon } from "../../components/Icon";
 import { useHttpClient } from "../../hooks/use-http-client";
 import { Role, roles } from "../../types/roles.type";
 import { DialogComponent } from "./dialog-component.interface";
+import { User } from "../../types/user.type";
 
 enum Situation {
 	Ready,
@@ -13,7 +14,10 @@ enum Situation {
 	Saved,
 }
 
-export const User: DialogComponent<{ user: any }> = ({ user, closeDialog }) => {
+export const UpsertUser: DialogComponent<{ user: User | null }> = ({
+	user,
+	closeDialog,
+}) => {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [role, setRole] = useState("user" as Role);

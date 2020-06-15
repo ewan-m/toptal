@@ -11,7 +11,9 @@ import { selectDateFilter } from "../store/work-log-filter.state";
 import { DateFilter } from "./dialogs/DateFilter";
 import { DeleteResource } from "./dialogs/DeleteResource";
 import { PreferredHours } from "./dialogs/PreferredHours";
-import { WorkLog } from "./dialogs/WorkLog";
+import { UpsertWorkLog } from "./dialogs/UpsertWorkLog";
+import { getWorkLogsAsHtml } from "./helpers/get-work-logs-as-html";
+import { WorkLog } from "../types/work-log.type";
 
 type ModalWindows = "none" | "work" | "hours" | "delete" | "filter";
 
@@ -35,8 +37,8 @@ const getQueryParams = (object: any) => {
 export const Dashboard = () => {
 	const [situation, setSituation] = useState(Situation.loading);
 	const [visibleModal, setVisibleModal] = useState("none" as ModalWindows);
-	const [workLogs, setWorkLogs] = useState([] as any[]);
-	const [selectedWorkLog, setSelectedWorkLog] = useState(null as any);
+	const [workLogs, setWorkLogs] = useState([] as WorkLog[]);
+	const [selectedWorkLog, setSelectedWorkLog] = useState(null as WorkLog | null);
 	const http = useHttpClient();
 	const userDetails = useRecoilValue(selectUserDetails);
 	const dateFilter = useRecoilValue(selectDateFilter);
@@ -99,9 +101,9 @@ export const Dashboard = () => {
 					>
 						<Icon withMargin="left">schedule</Icon>Choose your preferred hours
 					</button>
-					<button className="button button__secondary">
+					<a href={getWorkLogsAsHtml(workLogs)} download="WorkLogs.html" className="button button__secondary">
 						<Icon withMargin="left">cloud_download</Icon>Export
-					</button>
+					</a>
 				</div>
 				{situation === Situation.loading && <LoadingSpinner />}
 				{situation === Situation.loaded && (
@@ -164,7 +166,7 @@ export const Dashboard = () => {
 				onClose={closeModal}
 				title={selectedWorkLog ? "Edit work log" : "Add a work log"}
 			>
-				<WorkLog closeDialog={closeModal} workLog={selectedWorkLog} />
+				<UpsertWorkLog closeDialog={closeModal} workLog={selectedWorkLog} />
 			</Modal>
 			<Modal
 				isVisible={visibleModal === "hours"}

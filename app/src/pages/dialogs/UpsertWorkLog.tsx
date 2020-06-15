@@ -6,6 +6,7 @@ import { Errors } from "../../components/Errors";
 import { Icon } from "../../components/Icon";
 import { useHttpClient } from "../../hooks/use-http-client";
 import { DialogComponent } from "./dialog-component.interface";
+import { WorkLog } from "../../types/work-log.type";
 
 enum Situation {
 	Ready,
@@ -13,7 +14,7 @@ enum Situation {
 	Saved,
 }
 
-export const WorkLog: DialogComponent<{ workLog: any }> = ({
+export const UpsertWorkLog: DialogComponent<{ workLog: WorkLog | null }> = ({
 	workLog,
 	closeDialog,
 }) => {
