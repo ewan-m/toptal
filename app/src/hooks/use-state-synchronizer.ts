@@ -11,7 +11,7 @@ export const useStateSynchronizer = (
 		if (typeof value !== "string") {
 			value = JSON.stringify(value);
 		}
-		if (key && value && localStorage.getItem(key) !== value) {
+		if (key && localStorage.getItem(key) !== value) {
 			localStorage.setItem(key, value);
 		}
 	}, [value]);
