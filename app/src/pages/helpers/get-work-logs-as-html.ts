@@ -8,7 +8,7 @@ const makeSafe = (unsafeHtml: string) =>
 	unsafeHtml.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 export function getWorkLogsAsHtml(workLogs: WorkLog[]) {
-	const dateKeyedLogs = {} as { [va: string]: WorkLog[] };
+	const dateKeyedLogs = {} as { [date: string]: WorkLog[] };
 
 	workLogs.forEach((workLog) => {
 		dateKeyedLogs[workLog.date] = Array.isArray(dateKeyedLogs[workLog.date])
