@@ -1,6 +1,7 @@
-import { useRecoilValue } from "recoil";
+import { useHistory } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import { environment } from "../environment";
-import { selectToken } from "../store/auth.state";
+import { tokenAtom } from "../store/auth.state";
 
 interface Request {
 	method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -11,7 +12,8 @@ interface Request {
 }
 
 export const useHttpClient = () => {
-	const token = useRecoilValue(selectToken);
+	const [token, setToken] = useRecoilState(tokenAtom);
+	const history = useHistory();
 
 	const request = async ({ method, uri, headers, body, withAuth }: Request) => {
 		const url = environment.apiUrl + uri;
@@ -23,13 +25,20 @@ export const useHttpClient = () => {
 		};
 		body = JSON.stringify(body);
 
-		return (
+		const result = (
 			await fetch(url.toString(), {
 				headers,
 				method,
 				body,
 			})
 		).json();
+		result.then((resolved) => {
+			if (resolved?.message?.includes("Invalid token")) {
+				setToken("");
+				history.push("/");
+			}
+		});
+		return result;
 	};
 
 	return { request };
