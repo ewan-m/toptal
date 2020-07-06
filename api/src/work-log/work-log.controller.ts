@@ -24,6 +24,7 @@ import { CreateWorkLogDto } from "./create-work-log.dto";
 import { DateFilterDto, getDateQuery } from "./date-filter.dto";
 import { UpdateWorkLogDto } from "./update-work-log.dto";
 import { WorkLog } from "./work-log.entity";
+import { IsAdminGuard } from "src/guards/is-admin.guard";
 
 @Controller()
 export class WorkLogController {
@@ -70,6 +71,21 @@ export class WorkLogController {
 			throw new ForbiddenException(["Insufficient permissions to view record."]);
 		}
 		return matchingRecord;
+	}
+
+	@Post("/users/:userId/work-log")
+	@UseGuards(HasValidTokenGuard, IsAdminGuard)
+	async createWorkLogForOtherUser(
+		@Body() workLogDto: CreateWorkLogDto,
+		@Param() { userId },
+	) {
+		const workLog = new WorkLog();
+		workLog.user = { id: userId } as User;
+		workLog.note = workLogDto.note;
+		workLog.hoursWorked = workLogDto.hoursWorked;
+		workLog.date = workLogDto.date;
+
+		return this.workLogRepository.save(workLog);
 	}
 
 	@Post("/work-log")
